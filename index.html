@@ -2,29 +2,29 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name名称="viewport" content="width=device-width, initial-scale=1.0">
 <title>成长记录 · 1000工作台</title>
 <!-- canvas-confetti CDN 用于礼花动画 -->
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
-<style>
-/* ===== CSS Reset & Variables ===== */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --sidebar-w:210px;
-  --bg:#EBF4FC;--card-bg:#fff;--text:#1A2D4A;--text2:#5A718C;
-  --accent:#3B82F6;--accent-light:#EFF6FF;
-  --success:#10B981;--danger:#EF4444;--warn:#F59E0B;
+<script src源代码="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>脚本 src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></脚本><脚本 src源代码="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></脚本>脚本 src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></脚本>
+<style>样式>
+/* ===== CSS Reset & Variables ===== *//* ===== CSS重置与变量 ===== *//* ===== CSS重置与变量 ===== *//* ===== CSS Reset & Variables ===== *//* ===== CSS Reset & Variables ===== *//* ===== CSS重置与变量 ===== */
+*,*::before之前,*::after之后{box-sizing盒模型:border-box;margin外边距:0;padding内边距:0}
+:root根{根元素{
+  --sidebar-w:210px像素;
+  --bg:#EBF4FC;--card-bg--卡片背景:#fff;--text:#1A2D4A;--text2:#5A718C;
+  --accent:#3B82F6;--accent-light--强调色浅:#EFF6FF;
+  --success:#10B981;--danger--危险色:#EF4444;--warn--警告色:#F59E0B;
   --border:rgba(59,130,246,.06);
-  --shadow:0 1px 3px rgba(59,130,246,.05),0 4px 16px rgba(59,130,246,.06);
-  --radius:14px;--radius-sm:10px;
+  --shadow:0 1px像素 3px像素 rgba(59,130,246,.05),0 4px像素 16px像素 rgba(59,130,246,.06);
+  --radius:14px像素;--radius-sm:10px;
   /* 彩虹色系 */
-  --rainbow-1:#FF6B6B;--rainbow-2:#FFA94D;--rainbow-3:#FFD43B;
-  --rainbow-4:#69DB7C;--rainbow-5:#4DABF7;--rainbow-6:#748FFC;--rainbow-7:#DA77F2;
+  --rainbow-1:#FF6B6B;--rainbow-2:#FFA94D;--rainbow-3:#FFD43B;--彩虹-1:#FF6B6B;--彩虹-2:#FFA94D;--彩虹-3:#FFD43B;
+  --rainbow-4:#69DB7C;--rainbow-5:#4DABF7;--rainbow-6:#748FFC;--rainbow-7:#DA77F2;--彩虹-4:#69DB7C;--彩虹-5:#4DABF7;--彩虹-6:#748FFC;--彩虹-7:#DA77F2;  --彩虹-4:#69DB7C;--彩虹-5:#4DABF7;--彩虹-6:#748FFC;--彩虹-7:#DA77F2;--彩虹-4:#69DB7C;--彩虹-5:#4DABF7;--彩虹-6:#748FFC;--彩虹-7:#DA77F2;
 }
-html{font-size:16px;}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
-  background:linear-gradient(135deg,#E3F0FD 0%,#F0F4FF 30%,#FDF2F8 60%,#FFF7ED 100%);
+html{font-size:16px像素;}
+body主体{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;字体族:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",无衬线字体;
+  background:linear-gradient(135deg,#E3F0FD 0%,#F0F4FF 30%,#FDF2F8 60%,#FFF7ED 100%);背景:线性渐变(135度,#E3F0FD 0%,#F0F4FF 30%,#FDF2F8 60%,#FFF7ED 100%);
   background-attachment:fixed;
   color:var(--text);line-height:1.6;overflow:hidden;height:100dvh;
   -webkit-font-smoothing:antialiased;
