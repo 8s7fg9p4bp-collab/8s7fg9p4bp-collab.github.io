@@ -1,1267 +1,251 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name名称="viewport" content="width=device-width, initial-scale=1.0">
-<title>成长记录 · 1000工作台</title>
-<!-- canvas-confetti CDN 用于礼花动画 -->
-<script src源代码="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>脚本 src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></脚本><脚本 src源代码="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></脚本>脚本 src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></脚本>
-<style>样式>
-/* ===== CSS Reset & Variables ===== *//* ===== CSS重置与变量 ===== *//* ===== CSS重置与变量 ===== *//* ===== CSS Reset & Variables ===== *//* ===== CSS Reset & Variables ===== *//* ===== CSS重置与变量 ===== */
-*,*::before之前,*::after之后{box-sizing盒模型:border-box;margin外边距:0;padding内边距:0}
-:root根{根元素{
-  --sidebar-w:210px像素;
-  --bg:#EBF4FC;--card-bg--卡片背景:#fff;--text:#1A2D4A;--text2:#5A718C;
-  --accent:#3B82F6;--accent-light--强调色浅:#EFF6FF;
-  --success:#10B981;--danger--危险色:#EF4444;--warn--警告色:#F59E0B;
-  --border:rgba(59,130,246,.06);
-  --shadow:0 1px像素 3px像素 rgba(59,130,246,.05),0 4px像素 16px像素 rgba(59,130,246,.06);
-  --radius:14px像素;--radius-sm:10px;
-  /* 彩虹色系 */
-  --rainbow-1:#FF6B6B;--rainbow-2:#FFA94D;--rainbow-3:#FFD43B;--彩虹-1:#FF6B6B;--彩虹-2:#FFA94D;--彩虹-3:#FFD43B;
-  --rainbow-4:#69DB7C;--rainbow-5:#4DABF7;--rainbow-6:#748FFC;--rainbow-7:#DA77F2;--彩虹-4:#69DB7C;--彩虹-5:#4DABF7;--彩虹-6:#748FFC;--彩虹-7:#DA77F2;  --彩虹-4:#69DB7C;--彩虹-5:#4DABF7;--彩虹-6:#748FFC;--彩虹-7:#DA77F2;--彩虹-4:#69DB7C;--彩虹-5:#4DABF7;--彩虹-6:#748FFC;--彩虹-7:#DA77F2;
-}
-html{font-size:16px像素;}
-body主体{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;字体族:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",无衬线字体;
-  background:linear-gradient(135deg,#E3F0FD 0%,#F0F4FF 30%,#FDF2F8 60%,#FFF7ED 100%);背景:线性渐变(135度,#E3F0FD 0%,#F0F4FF 30%,#FDF2F8 60%,#FFF7ED 100%);
-  background-attachment:fixed;
-  color:var(--text);line-height:1.6;overflow:hidden;height:100dvh;
-  -webkit-font-smoothing:antialiased;
-}
-a{color:inherit;text-decoration:none;}
-
-/* ===== Layout ===== */
-#app{display:flex;height:100dvh;}
-
-/* ===== Sidebar ===== */
-#sidebar{
-  width:var(--sidebar-w);min-width:var(--sidebar-w);
-  background:linear-gradient(180deg,#1E3A5F 0%,#2563EB 40%,#3B82F6 70%,#60A5FA 100%);
-  display:flex;flex-direction:column;padding:20px 12px;
-  gap:3px;overflow-y:auto;user-select:none;z-index:10;
-  transition:transform .3s;position:relative;
-}
-/* 彩虹装饰线 */
-#sidebar::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--rainbow-1),var(--rainbow-2),var(--rainbow-3),var(--rainbow-4),var(--rainbow-5),var(--rainbow-6),var(--rainbow-7));
-}
-.sb-logo{
-  font-size:1.15rem;font-weight:800;color:#fff;padding:8px 6px 20px 6px;
-  letter-spacing:.03em;white-space:nowrap;
-  display:flex;align-items:center;gap:10px;
-}
-.sb-logo .ico{
-  font-size:1.6rem;width:40px;height:40px;border-radius:50%;
-  background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 20px rgba(147,197,253,.3);
-}
-.sb-logo .sub{display:block;font-size:.6rem;font-weight:400;opacity:.6;margin-top:2px;}
-.nav-item{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-  cursor:pointer;font-size:.82rem;font-weight:600;color:rgba(255,255,255,.6);
-  transition:all .2s;white-space:nowrap;border:none;background:none;width:100%;text-align:left;
-}
-.nav-item:hover{background:rgba(255,255,255,.12);color:#fff;}
-.nav-item.active{
-  background:rgba(255,255,255,.2);color:#fff;
-  box-shadow:0 4px 20px rgba(255,255,255,.15);
-  backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.25);
-}
-.sb-footer{margin-top:auto;padding:12px 6px 0 6px;font-size:.62rem;color:rgba(255,255,255,.35);}
-
-/* Sidebar toggle (mobile) */
-.sb-toggle{
-  display:none;position:fixed;top:12px;left:12px;z-index:999;
-  width:38px;height:38px;border-radius:10px;border:none;
-  background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;
-  font-size:1.2rem;cursor:pointer;
-  box-shadow:0 4px 16px rgba(59,130,246,.35);
-}
-
-/* ===== Main ===== */
-#main{flex:1;overflow-y:auto;padding:24px;position:relative;}
-#main::-webkit-scrollbar{width:6px;}
-#main::-webkit-scrollbar-track{background:transparent;}
-#main::-webkit-scrollbar-thumb{
-  background:linear-gradient(180deg,var(--rainbow-5),var(--rainbow-6),var(--rainbow-7));
-  border-radius:3px;
-}
-.panel{display:none;animation:fadeIn .35s ease;}
-.panel.active{display:block;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-/* 顶部彩虹装饰条 */
-#main::before{
-  content:'';position:sticky;top:0;left:0;right:0;height:3px;z-index:5;
-  background:linear-gradient(90deg,var(--rainbow-1),var(--rainbow-2),var(--rainbow-3),var(--rainbow-4),var(--rainbow-5),var(--rainbow-6),var(--rainbow-7));
-  display:block;
-}
-
-/* ===== Common ===== */
-.card{
-  background:var(--card-bg);border-radius:var(--radius);padding:20px;
-  box-shadow:0 2px 12px rgba(59,130,246,.06),0 1px 3px rgba(0,0,0,.03);
-  margin-bottom:16px;border:1px solid var(--border);
-  transition:box-shadow .25s;
-}
-.card:hover{box-shadow:0 4px 20px rgba(59,130,246,.1),0 1px 4px rgba(0,0,0,.04);}
-.card h3{font-size:.95rem;margin-bottom:14px;color:var(--text);display:flex;align-items:center;gap:8px;font-weight:700;}
-.card h4{font-size:.82rem;color:#2C3E5C;margin-bottom:10px;font-weight:700;}
-.pg-title{
-  font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:18px;
-  display:flex;align-items:center;gap:10px;
-  padding:10px 16px;border-radius:14px;
-  background:linear-gradient(135deg,rgba(59,130,246,.06) 0%,rgba(147,197,253,.1) 100%);
-  border:1px solid rgba(59,130,246,.1);
-}
-.pg-title .emoji{font-size:1.4rem;}
-
-/* ===== Buttons ===== */
-.btn{
-  display:inline-flex;align-items:center;gap:6px;border:none;padding:9px 18px;
-  border-radius:22px;font-size:.78rem;font-weight:600;cursor:pointer;
-  transition:all .2s;font-family:inherit;white-space:nowrap;
-}
-.btn:active{transform:scale(.97);}
-.btn-primary{
-  background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;
-  box-shadow:0 4px 14px rgba(59,130,246,.25);
-}
-.btn-primary:hover{box-shadow:0 6px 22px rgba(59,130,246,.4);transform:translateY(-1px);}
-.btn-outline{background:#fff;color:var(--accent);border:1.5px solid var(--accent);}
-.btn-outline:hover{background:var(--accent-light);box-shadow:0 4px 14px rgba(59,130,246,.15);}
-.btn-sm{padding:5px 12px;font-size:.7rem;border-radius:14px;}
-.btn-success{
-  background:linear-gradient(135deg,#10B981,#059669);color:#fff;
-  font-size:.82rem;padding:10px 22px;
-  box-shadow:0 4px 14px rgba(16,185,129,.25);
-}
-.btn-success:hover{box-shadow:0 6px 20px rgba(16,185,129,.4);transform:translateY(-1px);}
-.btn-danger{
-  background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;
-  font-size:.82rem;padding:10px 22px;
-  box-shadow:0 4px 14px rgba(239,68,68,.25);
-}
-.btn-danger:hover{box-shadow:0 6px 20px rgba(239,68,68,.4);transform:translateY(-1px);}
-.btn-del{background:#FEE2E2;color:#B91C1C;font-size:.68rem;padding:3px 8px;border-radius:8px;}
-
-/* ===== Tags ===== */
-.tag{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.66rem;font-weight:700;}
-.tag-green{background:#D1FAE5;color:#065F46;}
-.tag-blue{background:#DBEAFE;color:#1E40AF;}
-.tag-orange{background:#FEF3C7;color:#92400E;}
-.tag-red{background:#FEE2E2;color:#991B1B;}
-.tag-rainbow{background:linear-gradient(90deg,var(--rainbow-1),var(--rainbow-2),var(--rainbow-3),var(--rainbow-4),var(--rainbow-5),var(--rainbow-6),var(--rainbow-7));color:#fff;padding:3px 10px;}
-
-/* ===== Inputs ===== */
-input,textarea,select{
-  border:1.5px solid #CBD5E1;border-radius:var(--radius-sm);padding:10px 14px;
-  font-size:.8rem;font-family:inherit;outline:none;transition:.2s;width:100%;
-  background:#F8FAFC;color:#1A2D4A;
-}
-input:focus,textarea:focus,select:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(59,130,246,.1);
-  background:#fff;
-}
-textarea{resize:vertical;min-height:80px;}
-::placeholder{color:#94A3B8;}
-
-/* ===== Stats ===== */
-.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px;}
-.stat-box{
-  background:var(--card-bg);border-radius:12px;padding:16px 12px;text-align:center;
-  box-shadow:0 2px 10px rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.08);
-  transition:transform .2s,box-shadow .2s;
-}
-.stat-box:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(59,130,246,.12);}
-.stat-box .num{font-size:1.6rem;font-weight:800;color:var(--accent);}
-.stat-box .lbl{font-size:.68rem;color:var(--text2);margin-top:3px;font-weight:500;}
-
-/* ===== Heatmap ===== */
-.heatmap{display:flex;flex-wrap:wrap;gap:3px;justify-content:flex-start;}
-.heatmap .day{width:12px;height:12px;border-radius:3px;background:#E8ECF2;}
-.heatmap .day.lv1{background:#10B981;}
-.heatmap .day.lv2{background:#F59E0B;}
-.heatmap .day.lv3{background:#EF4444;}
-.heatmap .day.today{border:2px solid #1E293B;}
-/* ===== Mood ===== */
-.mood-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
-.mood-btn{
-  width:48px;height:48px;border-radius:50%;border:2px solid transparent;cursor:pointer;
-  font-size:1.5rem;display:flex;align-items:center;justify-content:center;
-  transition:all .2s;background:#F8FAFC;
-}
-.mood-btn:hover{transform:scale(1.12);}
-.mood-btn.sel{
-  border-color:var(--accent);
-  box-shadow:0 0 0 5px rgba(59,130,246,.12);
-  background:#EFF6FF;
-}
-
-/* ===== Diet ===== */
-.day-card{
-  margin-bottom:14px;border:1.5px solid rgba(59,130,246,.1);border-radius:var(--radius);
-  overflow:hidden;background:#fff;
-  box-shadow:0 2px 10px rgba(59,130,246,.04);
-}
-.day-card h4{
-  background:linear-gradient(135deg,#EFF6FF,#F0F9FF);
-  padding:10px 16px;border-bottom:1px solid rgba(59,130,246,.1);font-size:.8rem;
-}
-.meal-row{padding:12px 16px;border-bottom:1px solid #F3F4F6;display:flex;gap:10px;align-items:flex-start;}
-.meal-row:last-child{border-bottom:none;}
-.meal-tag{font-size:.66rem;font-weight:700;padding:3px 9px;border-radius:8px;white-space:nowrap;min-width:46px;text-align:center;}
-.meal-tag.bf{background:#FEF3C7;color:#92400E;}
-.meal-tag.lu{background:#D1FAE5;color:#065F46;}
-.meal-tag.di{background:#EDE9FE;color:#5B21B6;}
-.meal-info{flex:1;min-width:0;}
-.meal-info .name{font-weight:700;font-size:.82rem;}
-.meal-info .detail{font-size:.7rem;color:var(--text2);margin-top:3px;word-break:break-all;}
-.meal-info .steps{font-size:.68rem;color:#8899B4;margin-top:2px;}
-.airfry{display:inline-block;font-size:.64rem;font-weight:700;background:#FFF7ED;color:#C2410C;padding:2px 8px;border-radius:6px;margin-top:4px;}
-.diet-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px;}
-.diet-tab{
-  border:none;padding:8px 13px;border-radius:20px;font-size:.75rem;font-weight:600;
-  cursor:pointer;background:#E2E8F0;color:#64748B;transition:all .2s;
-}
-.diet-tab.on{
-  background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;
-  box-shadow:0 4px 12px rgba(59,130,246,.25);
-}
-
-/* ===== Ledger ===== */
-.ledger-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
-.ledger-form input,.ledger-form select{width:auto;flex:1;min-width:80px;}
-.ledger-item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #F3F4F6;font-size:.78rem;}
-.ledger-item .amt-exp{color:#EF4444;font-weight:700;margin-left:auto;white-space:nowrap;}
-.ledger-item .amt-inc{color:#10B981;font-weight:700;margin-left:auto;white-space:nowrap;}
-.cat-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:8px 0;}
-.cat-bar div{transition:width .5s;}
-.cat-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:.66rem;margin-top:6px;}
-
-/* ===== Trending V2 · 爆款二创 ===== */
-.trend-cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px;}
-
-/* ===== 品类热点卡片 ===== */
-.trend-card{
-  border-radius:var(--radius);padding:16px;border:1.5px solid rgba(59,130,246,.1);
-  background:#fff;transition:all .25s;cursor:default;position:relative;
-  box-shadow:0 2px 10px rgba(59,130,246,.04);
-}
-.trend-card:hover{
-  border-color:var(--accent);
-  box-shadow:0 8px 24px rgba(59,130,246,.12);
-  transform:translateY(-3px);
-}
-.trend-card .t-cat{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
-.trend-card .t-title{font-weight:700;font-size:.82rem;margin-bottom:4px;line-height:1.3;}
-.trend-card .t-detail{font-size:.68rem;color:var(--text2);line-height:1.5;}
-.trend-card .t-val{font-size:1.2rem;font-weight:800;margin-top:6px;}
-.trend-card .t-note{font-size:.6rem;color:var(--text2);margin-top:2px;}
-
-/* ===== 热度标签 ===== */
-.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.62rem;font-weight:700;margin-right:4px;vertical-align:middle;}
-.tag-hot{background:#FEE2E2;color:#DC2626;animation:pulse-tag 2s infinite;}
-.tag-blue{background:#DBEAFE;color:#2563EB;}
-.tag-green{background:#D1FAE5;color:#059669;}
-@keyframes pulse-tag{0%,100%{opacity:1}50%{opacity:.5}}
-
-/* ===== 热度条 ===== */
-.heat-bar-wrap{background:#F1F5F9;border-radius:4px;height:5px;margin:6px 0;overflow:hidden;}
-.heat-bar-fill{border-radius:4px;height:100%;transition:width .8s ease;}
-.heat-bar-hot{background:linear-gradient(90deg,#F59E0B,#EF4444);}
-.heat-bar-rising{background:linear-gradient(90deg,#38BDF8,#8B5CF6);}
-.heat-bar-stable{background:linear-gradient(90deg,#10B981,#34D399);}
-
-/* ===== 二创切入点卡片 ===== */
-.remix-block{
-  background:linear-gradient(135deg,#F8FAFC,#F0F4FF);border:1px solid rgba(59,130,246,.1);
-  border-radius:10px;padding:12px;margin-top:12px;
-}
-.remix-label{font-size:.62rem;font-weight:800;color:var(--accent);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;}
-.remix-title{font-weight:700;font-size:.76rem;margin-bottom:4px;color:#1A2D4A;}
-.remix-steps{margin-top:8px;}
-.remix-step{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:.7rem;color:var(--text2);}
-.remix-step-num{
-  flex:0 0 20px;height:20px;border-radius:50%;
-  background:linear-gradient(135deg,#3B82F6,#2563EB);
-  color:#fff;font-size:.65rem;font-weight:800;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px rgba(59,130,246,.25);
-}
-
-/* ===== 今日灵感横幅 ===== */
-.inspire-banner{
-  background:linear-gradient(135deg,#EFF6FF 0%,#F0F9FF 40%,#FFF7ED 70%,#FDF2F8 100%);
-  border:2px solid rgba(59,130,246,.15);border-radius:16px;
-  padding:18px 22px;margin-bottom:16px;
-  display:flex;gap:16px;align-items:center;flex-wrap:wrap;
-  position:relative;overflow:hidden;
-}
-/* 彩虹微光 */
-.inspire-banner::before{
-  content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;
-  background:radial-gradient(circle,rgba(255,107,107,.1),transparent 70%);
-  border-radius:50%;
-}
-.inspire-banner::after{
-  content:'';position:absolute;bottom:-30%;left:-10%;width:150px;height:150px;
-  background:radial-gradient(circle,rgba(147,197,253,.15),transparent 70%);
-  border-radius:50%;
-}
-.inspire-icon{font-size:2.5rem;line-height:1;position:relative;z-index:1;}
-.inspire-body{flex:1;min-width:200px;position:relative;z-index:1;}
-.inspire-date{font-size:.68rem;color:var(--text2);margin-bottom:2px;}
-.inspire-hook{font-weight:800;font-size:.9rem;color:#1A2D4A;margin-bottom:4px;}
-.inspire-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
-.inspire-tag{padding:4px 12px;border-radius:16px;font-size:.68rem;font-weight:700;cursor:default;transition:.2s;}
-.inspire-tag:hover{transform:scale(1.05);}
-.inspire-video{background:#FEE2E2;color:#DC2626;}
-.inspire-live{background:#FEF3C7;color:#D97706;}
-.inspire-article{background:#DBEAFE;color:#2563EB;}
-.inspire-product{background:#D1FAE5;color:#059669;}
-
-/* ===== Confetti overlay ===== */
-.confetti-msg{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  z-index:9999;background:rgba(0,0,0,.82);color:#fff;padding:16px 36px;
-  border-radius:16px;font-size:1.1rem;font-weight:700;text-align:center;
-  animation:popIn .4s ease;pointer-events:none;
-}
-@keyframes popIn{0%{transform:translate(-50%,-50%) scale(.5);opacity:0}70%{transform:translate(-50%,-50%) scale(1.1)}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
-
-/* ===== Toast ===== */
-.toast{
-  position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9998;
-  background:linear-gradient(135deg,#1E3A5F,#2563EB);color:#fff;
-  padding:12px 28px;border-radius:24px;font-size:.78rem;font-weight:600;
-  animation:toastAnim 2.6s ease forwards;pointer-events:none;
-  box-shadow:0 8px 30px rgba(37,99,235,.35);
-}
-@keyframes toastAnim{0%{opacity:0;transform:translateX(-50%) translateY(-16px)}12%{opacity:1;transform:translateX(-50%) translateY(0)}75%{opacity:1}100%{opacity:0}}
-
-/* ===== Responsive ===== */
-@media(max-width:768px){
-  :root{--sidebar-w:200px;}
-  #sidebar{
-    position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);
-    box-shadow:4px 0 20px rgba(0,0,0,.15);
-  }
-  #sidebar.open{transform:translateX(0);}
-  .sb-toggle{display:flex;align-items:center;justify-content:center;}
-  body.sb-open .sb-toggle{left:calc(var(--sidebar-w) + 12px);}
-  #main{padding:16px;}
-  .stat-row{grid-template-columns:repeat(2,1fr);}
-  .card{padding:14px;}
-  .btn-success,.btn-danger{padding:8px 16px;font-size:.75rem;}
-  .trend-cal{grid-template-columns:1fr;}
-}
-
-/* ===== Multi-Subject Learning ===== */
-#panel-multisubject .multi-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
-#panel-multisubject .multi-tab{
-  padding:9px 16px;border-radius:22px;border:1.5px solid rgba(59,130,246,.15);
-  background:#fff;color:#5A718C;font-size:.78rem;font-weight:600;cursor:pointer;
-  transition:all .25s;display:flex;align-items:center;gap:6px;
-}
-#panel-multisubject .multi-tab:hover{border-color:var(--accent);color:var(--accent);background:#EFF6FF;}
-#panel-multisubject .multi-tab.active{
-  background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;border-color:transparent;
-  box-shadow:0 6px 18px rgba(59,130,246,.3);
-}
-#panel-multisubject .multi-tab .badge{
-  font-size:.65rem;padding:2px 8px;border-radius:12px;
-  background:rgba(255,255,255,.25);font-weight:700;
-}
-#panel-multisubject .multi-daybar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
-#panel-multisubject .day-pill{
-  background:linear-gradient(135deg,#3B82F6,#1D4ED8);color:#fff;
-  padding:10px 20px;border-radius:24px;font-weight:700;font-size:.9rem;
-  box-shadow:0 4px 16px rgba(59,130,246,.3);
-  position:relative;overflow:hidden;
-}
-/* 彩虹微光点缀 */
-#panel-multisubject .day-pill::after{
-  content:'';position:absolute;top:0;left:-100%;width:60px;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
-  animation:dayShine 2.5s infinite;
-}
-@keyframes dayShine{0%{left:-100%}100%{left:200%}}
-#panel-multisubject .lvl-pill{
-  padding:6px 14px;border-radius:16px;font-size:.72rem;font-weight:700;
-  box-shadow:0 2px 8px rgba(0,0,0,.06);
-}
-#panel-multisubject .lvl-beginner{background:#D1FAE5;color:#065F46;}
-#panel-multisubject .lvl-easy{background:#DBEAFE;color:#1E40AF;}
-#panel-multisubject .lvl-medium{background:#FEF3C7;color:#92400E;}
-#panel-multisubject .lvl-hard{background:#FEE2E2;color:#991B1B;}
-#panel-multisubject .multi-sop{
-  border:1.5px solid rgba(59,130,246,.1);border-radius:12px;overflow:hidden;
-  margin-bottom:10px;background:#fff;
-  box-shadow:0 1px 6px rgba(59,130,246,.04);
-  transition:box-shadow .2s,border-color .2s;
-}
-#panel-multisubject .multi-sop.open{
-  border-color:rgba(59,130,246,.3);
-  box-shadow:0 4px 16px rgba(59,130,246,.1);
-}
-#panel-multisubject .multi-sop-head{
-  display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;font-weight:700;
-  font-size:.8rem;user-select:none;background:#FAFBFC;transition:background .2s;
-}
-#panel-multisubject .multi-sop-head:hover{background:#EFF6FF;}
-#panel-multisubject .multi-sop-head .arrow{margin-left:auto;transition:transform .25s;font-size:.7rem;color:var(--text2);}
-#panel-multisubject .multi-sop.open .multi-sop-head .arrow{transform:rotate(180deg);}
-#panel-multisubject .multi-sop-body{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;background:#fff;}
-#panel-multisubject .multi-sop.open .multi-sop-body{max-height:800px;padding:12px 16px 16px;}
-#panel-multisubject .multi-sop-body ul{margin:0;padding-left:18px;}
-#panel-multisubject .multi-sop-body li{margin-bottom:4px;font-size:.76rem;line-height:1.5;color:#2C3E5C;}
-#panel-multisubject .multi-qz{
-  background:linear-gradient(135deg,#F8FAFC,#F0F4FF);border-radius:10px;
-  padding:12px;margin-bottom:8px;border:1px solid rgba(59,130,246,.06);
-}
-#panel-multisubject .multi-qz .q{font-weight:700;font-size:.75rem;margin-bottom:6px;color:#1A2D4A;}
-#panel-multisubject .multi-opt{
-  display:inline-block;padding:5px 14px;border-radius:14px;font-size:.7rem;margin:3px 6px 3px 0;
-  background:#fff;border:1.5px solid #CBD5E1;cursor:pointer;transition:.15s;
-  color:#2C3E5C;font-weight:500;
-}
-#panel-multisubject .multi-opt:hover{background:#EFF6FF;border-color:var(--accent);color:var(--accent);}
-#panel-multisubject .multi-opt.correct{background:#10B981!important;color:#fff!important;border-color:#10B981!important;box-shadow:0 2px 8px rgba(16,185,129,.25)!important;}
-#panel-multisubject .multi-opt.wrong{background:#EF4444!important;color:#fff!important;border-color:#EF4444!important;box-shadow:0 2px 8px rgba(239,68,68,.25)!important;}
-#panel-multisubject .multi-opt.locked{pointer-events:none;}
-#panel-multisubject .multi-feedback{font-size:.68rem;margin-top:4px;font-weight:600;}
-#panel-multisubject .multi-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
-#panel-multisubject .multi-progress{
-  height:10px;background:#E2E8F0;border-radius:5px;overflow:hidden;margin:8px 0;
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.06);
-}
-#panel-multisubject .multi-progress>div{
-  height:100%;border-radius:5px;
-  background:linear-gradient(90deg,#69DB7C,#3B82F6,#8B5CF6);
-  transition:width .4s;
-  box-shadow:0 0 8px rgba(59,130,246,.2);
-}
-#panel-multisubject .multi-heat{display:flex;flex-wrap:wrap;gap:3px;margin-top:10px;}
-#panel-multisubject .multi-heat .d{width:12px;height:12px;border-radius:3px;background:#E8ECF2;}
-#panel-multisubject .multi-heat .d.easy{background:#10B981;}
-#panel-multisubject .multi-heat .d.hard{background:#F59E0B;}
-#panel-multisubject .multi-heat .d.today{box-shadow:0 0 0 2px var(--accent);animation:pulse-dot 1.5s infinite;}
-@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 2px var(--accent)}50%{box-shadow:0 0 0 5px rgba(59,130,246,.3)}}
-</style>
-</head>
-<body>
-
-<!-- Mobile sidebar toggle -->
-<button class="sb-toggle" onclick="toggleSidebar()" aria-label="菜单">☰</button>
-
-<div id="app">
-<!-- ===== SIDEBAR ===== -->
-<aside id="sidebar">
-  <div class="sb-logo">
-    <span class="ico">🌈</span>
-    <div>晴空工作台<span class="sub">· 彩虹成长</span></div>
-  </div>
-  <button class="nav-item active" data-panel="multisubject">📚 五科并行</button>
-  <button class="nav-item" data-panel="journal">✍️ 个人总结</button>
-  <button class="nav-item" data-panel="diet">🥗 减脂计划</button>
-  <button class="nav-item" data-panel="ledger">💰 简单记账</button>
-  <button class="nav-item" data-panel="trending">🔥 爆款二创</button>
-  <div class="sb-footer">1000陪你成长 · 2026</div>
-</aside>
-
-<!-- ===== MAIN ===== -->
-<main id="main">
-
-<!-- ========== 1. 个人总结 ========== -->
-<section class="panel" id="panel-journal">
-  <div class="pg-title"><span class="emoji">✍️</span> 个人总结</div>
-
-  <div class="card">
-    <h3>😊 今日心情</h3>
-    <div class="mood-row" id="mood-selector"></div>
-  </div>
-  <div class="card">
-    <h3>💡 每日收获</h3>
-    <textarea id="journal-harvest" placeholder="今天学到了什么？有什么进步？"></textarea>
-  </div>
-  <div class="card">
-    <h3>🙏 感恩反思</h3>
-    <textarea id="journal-gratitude" placeholder="今天想感谢谁？有什么需要反思的？"></textarea>
-    <button class="btn btn-primary" style="margin-top:10px;" onclick="saveJournal()">💾 保存今日总结</button>
-  </div>
-  <div class="card">
-    <h3>📆 心情回顾</h3>
-    <div class="heatmap" id="mood-heatmap"></div>
-    <div id="journal-history" style="margin-top:14px;"></div>
-  </div>
-</section>
-
-<!-- ========== 3. 减脂计划 ========== -->
-<section class="panel" id="panel-diet">
-  <div class="pg-title"><span class="emoji">🥗</span> 减脂计划 · 7天空气炸锅食谱</div>
-  <div class="diet-tabs" id="diet-days"></div>
-  <div class="card" id="diet-content"></div>
-  <div class="card">
-    <h3>🛒 7天食材采购清单</h3>
-    <div id="shopping-list"></div>
-  </div>
-</section>
-
-<!-- ========== 4. 简单记账 ========== -->
-<section class="panel" id="panel-ledger">
-  <div class="pg-title"><span class="emoji">💰</span> 简单记账</div>
-  <div class="stat-row" id="ledger-stats"></div>
-  <div class="card">
-    <h3>➕ 记一笔</h3>
-    <div class="ledger-form">
-      <input type="date" id="ledger-date">
-      <input type="text" id="ledger-item" placeholder="项目名称">
-      <input type="number" id="ledger-amt" placeholder="金额" step="0.01" min="0" style="min-width:90px;">
-      <select id="ledger-type" style="min-width:80px;">
-        <option value="expense">支出</option><option value="income">收入</option>
-      </select>
-      <input type="text" id="ledger-note" placeholder="备注(可选)" style="min-width:100px;">
-      <button class="btn btn-primary" onclick="addLedger()">确认</button>
-    </div>
-  </div>
-  <div class="card">
-    <h3>📊 本月分类统计</h3>
-    <div id="cat-breakdown"></div>
-  </div>
-  <div class="card">
-    <h3>📋 明细列表</h3>
-    <div id="ledger-list"></div>
-  </div>
-</section>
-
-<!-- ========== 5. 爆款二创 ========== -->
-<section class="panel" id="panel-trending">
-  <div class="pg-title"><span class="emoji">🔥</span> 爆款二创 · 行业热点</div>
-  <p style="font-size:.78rem;color:var(--text2);margin:-10px 0 16px;">每个品类左侧展示当前什么火，右侧给出你可以怎么蹭热度</p>
-
-  <!-- ===== 今日灵感 ===== -->
-  <div class="inspire-banner" id="today-inspire"></div>
-
-  <!-- ✏️ 文具品类 -->
-  <div class="card" id="trend-stationery-card"></div>
-
-  <!-- 💡 灯具品类 -->
-  <div class="card" id="trend-lighting-card"></div>
-
-  <!-- 🍵 茶叶品类 -->
-  <div class="card" id="trend-tea-card"></div>
-
-  <!-- 💡 全域灵感（底部） -->
-  <div class="card">
-    <h3>🧠 跨界灵感：怎么把热度抢到手</h3>
-    <div id="trend-inspiration"></div>
-    <button class="btn btn-primary" style="margin-top:12px;" onclick="refreshTrending()">🔄 刷新数据</button>
-  </div>
-</section>
-
-<!-- ========== 1. 五科并行学习 ========== -->
-<section class="panel active" id="panel-multisubject">
-  <div class="pg-title"><span class="emoji">📚</span> 五科并行 · 自适应学习</div>
-  <p style="font-size:.78rem;color:var(--text2);margin:-10px 0 16px;">每个科目独立难度、独立打卡。点击"轻松达标"明天自动加难度，点击"太难了"明天自动减难度。</p>
-
-  <div class="stat-row" id="multi-stats">
-    <div class="stat-box"><div class="stat-num" id="multi-stat-day">1</div><div class="stat-label">已坚持天数</div></div>
-    <div class="stat-box"><div class="stat-num" id="multi-stat-easy">0</div><div class="stat-label">轻松达标</div></div>
-    <div class="stat-box"><div class="stat-num" id="multi-stat-hard">0</div><div class="stat-label">太难了</div></div>
-    <div class="stat-box"><div class="stat-num" id="multi-stat-rate">-</div><div class="stat-label">达标率</div></div>
-  </div>
-
-  <div class="card">
-    <div class="multi-tabs" id="multi-tabs"></div>
-    <div class="multi-daybar">
-      <div class="day-pill" id="multi-day-pill">📖 第 1 天</div>
-      <div id="multi-level-pill"></div>
-    </div>
-    <div id="multi-sop-container"></div>
-    <div class="multi-actions" id="multi-actions"></div>
-  </div>
-
-  <div class="card">
-    <h3>🗓️ 365天打卡追踪表</h3>
-    <div style="font-size:.72rem;color:var(--text2);margin-bottom:8px;">
-      <span style="display:inline-block;width:10px;height:10px;background:#10B981;border-radius:3px;margin-right:4px;"></span>轻松达标
-      <span style="display:inline-block;width:10px;height:10px;background:#F59E0B;border-radius:3px;margin:0 4px 0 12px;"></span>太难了
-      <span style="display:inline-block;width:10px;height:10px;background:#E8ECF2;border-radius:3px;margin:0 4px 0 12px;"></span>未打卡
-    </div>
-    <div class="multi-progress"><div id="multi-progress-bar" style="width:0%;"></div></div>
-    <div style="font-size:.7rem;color:var(--text2);" id="multi-progress-text">进度 0/365 天</div>
-    <div class="multi-heat" id="multi-heatmap"></div>
-  </div>
-</section>
-
-</main>
-</div>
-
-<script>
-// ============================================================
-// ==================== DATA HELPERS ==========================
-// ============================================================
-const KEYS={journal:'ws_j',ledger:'ws_l',diet:'ws_d'};
-function load(k){try{return JSON.parse(localStorage.getItem(k))||{}}catch{return{}}}
-function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
-function today(){return new Date().toISOString().slice(0,10)}
-
-// ==================== NAVIGATION ============================
-let sidebarOpen=false;
-function toggleSidebar(){
-  sidebarOpen=!sidebarOpen;
-  document.getElementById('sidebar').classList.toggle('open',sidebarOpen);
-  document.body.classList.toggle('sb-open',sidebarOpen);
-}
-
-document.querySelectorAll('.nav-item').forEach(el=>{
-  el.addEventListener('click',()=>{
-    // Close mobile sidebar
-    sidebarOpen=false;
-    document.getElementById('sidebar').classList.remove('open');
-    document.body.classList.remove('sb-open');
-    // Activate nav
-    document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
-    el.classList.add('active');
-    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
-    const pid='panel-'+el.dataset.panel;
-    document.getElementById(pid).classList.add('active');
-    // Render on switch
-    const fn={journal:renderJournal,diet:renderDiet,ledger:renderLedger,trending:renderTrending,multisubject:renderMultiSubject};
-    if(fn[el.dataset.panel])fn[el.dataset.panel]();
-  });
-});
-
-// ==================== TOAST ================================
-function toast(msg){
-  const t=document.createElement('div');t.className='toast';t.textContent=msg;
-  document.body.appendChild(t);setTimeout(()=>t.remove(),2800);
-}
-
-// ==================== CONFETTI =============================
-function launchConfetti(){
-  confetti({particleCount:120,spread:90,origin:{y:.6},colors:['#FF6B6B','#FFA94D','#FFD43B','#69DB7C','#4DABF7','#748FFC','#DA77F2','#3B82F6','#10B981']});
-  setTimeout(()=>confetti({particleCount:60,spread:60,origin:{y:.65,x:.2},colors:['#4DABF7','#69DB7C','#FFD43B']}),200);
-  setTimeout(()=>confetti({particleCount:60,spread:60,origin:{y:.65,x:.8},colors:['#F59E0B','#EC4899']}),400);
-}
-function showEncourage(msg){
-  const el=document.createElement('div');el.className='confetti-msg';el.textContent=msg;
-  document.body.appendChild(el);
-  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .5s';},2500);
-  setTimeout(()=>el.remove(),3000);
-}
-
-// ============================================================
-// ================ 1. 个人总结 ==============================
-// ============================================================
-const MOODS=['😄','😊','😐','😔','😢'];
-const MOOD_LABELS=['超开心','不错','一般','低落','难过'];
-const MOOD_COLORS=['#FCD34D','#A3E635','#93C5FD','#C4B5FD','#FCA5A5'];
-
-function getJournalData(){
-  const d=load(KEYS.journal);
-  if(!d.entries)d.entries={};if(!d.moods)d.moods={};return d;
-}
-
-function renderJournal(){
-  const data=getJournalData();
-  const td=today();
-  const cur=data.moods[td]||'';
-
-  // Mood
-  document.getElementById('mood-selector').innerHTML=MOODS.map((m,i)=>`
-    <button class="mood-btn${cur===m?' sel':''}" onclick="setMood('${m}')" title="${MOOD_LABELS[i]}">${m}</button>
-  `).join('');
-
-  // Entry
-  const e=data.entries[td]||{harvest:'',gratitude:''};
-  document.getElementById('journal-harvest').value=e.harvest||'';
-  document.getElementById('journal-gratitude').value=e.gratitude||'';
-
-  // Mood heatmap
-  const mc=document.getElementById('mood-heatmap');
-  if(mc){
-    const s=new Date(2026,0,1);const en=new Date(2026,11,31);
-    let h='';const d=new Date(s);
-    while(d<=en){
-      const ds=d.toISOString().slice(0,10);
-      const mi=MOODS.indexOf(data.moods[ds]);
-      let cls='day';if(ds===td)cls+=' today';
-      h+=`<div class="${cls}" style="background:${mi>=0?MOOD_COLORS[mi]:'#E8ECF2'}" title="${ds}${mi>=0?' · '+MOOD_LABELS[mi]:''}"></div>`;
-      d.setDate(d.getDate()+1);
-    }
-    mc.innerHTML=h;
-  }
-
-  // History
-  const keys=Object.keys(data.entries).sort().reverse().slice(0,10);
-  document.getElementById('journal-history').innerHTML=keys.length
-    ?keys.map(k=>{
-      const ent=data.entries[k];
-      return `<div class="card" style="margin-bottom:8px;padding:12px 16px;">
-        <div style="font-weight:700;font-size:.78rem;">📅 ${k} ${data.moods[k]||''}</div>
-        <div style="font-size:.7rem;color:var(--text2);margin-top:4px;"><strong>收获：</strong>${ent.harvest||'—'}</div>
-        <div style="font-size:.7rem;color:var(--text2);margin-top:2px;"><strong>感恩：</strong>${ent.gratitude||'—'}</div>
-      </div>`;
-    }).join('')
-    :'<div style="font-size:.73rem;color:var(--text2);">还没有总结记录，从今天开始吧 📝</div>';
-}
-
-function setMood(m){
-  const data=getJournalData();data.moods[today()]=m;
-  save(KEYS.journal,data);renderJournal();
-}
-function saveJournal(){
-  const data=getJournalData();
-  data.entries[today()]={harvest:document.getElementById('journal-harvest').value,gratitude:document.getElementById('journal-gratitude').value};
-  save(KEYS.journal,data);toast('✅ 今日总结已保存！');
-}
-
-// ============================================================
-// ================ 3. 减脂计划 ==============================
-// ============================================================
-const DIET_DAYS=['周一','周二','周三','周四','周五','周六','周日'];
-let activeDiet=0;
-
-// 食材清单严格按照用户提供
-const INGREDIENTS={
-  fruit:'苹果、小番茄、阳光青提、西瓜、菠萝、香蕉、火龙果、猕猴桃、哈密瓜、蓝莓、牛油果、芒果',
-  carb:'南瓜、土豆、山药、莲藕、玉米、红薯',
-  protein:'牛肉、口蘑、鸡胸肉、鸡翅、鸡脚、水煮蛋、豆腐、明虾、鸡腿肉、包心鱼丸、虾滑、鹌鹑蛋、巴沙鱼、花螺、猪肉',
-  veg:'冬瓜、金针菇、裙带菜、紫菜、番茄、黄瓜、火腿、西兰花、腐竹、生菜、洋葱、豆角、豆皮、酱干、莴笋、豆泡、芦笋、香菇、娃娃菜、豆芽、胡萝卜、彩椒、百合、包菜、秋葵、芹菜、苦瓜、平菇、螺丝椒、木耳、茭白、丝瓜、西葫芦、荷兰豆、四季豆、菊花菜、空心菜、海带丝、紫甘蓝',
-  sauce:'蒜末+小米椒+白芝麻+辣椒盐+生抽+香油+少许糖+醋',
-};
-
-const RECIPES=[
-  {day:'周一',bf:{name:'蓝莓酸奶碗+鹌鹑蛋',detail:'蓝莓50g+无糖酸奶150g+鹌鹑蛋3个',steps:'蓝莓洗净，鹌鹑蛋水煮去壳',kcal:250},
-    lu:{name:'空气炸鸡胸肉+西兰花',detail:'鸡胸肉150g+西兰花200g+灵魂蘸料',steps:'鸡胸肉切片腌10min，西兰花焯水，同入炸锅',airfry:'180℃ 12分钟',kcal:340},
-    di:{name:'番茄豆腐金针菇汤',detail:'番茄1个+嫩豆腐150g+金针菇100g',steps:'番茄炒出汁加水煮开，放豆腐金针菇5min',kcal:175}},
-  {day:'周二',bf:{name:'苹果+水煮蛋+牛奶',detail:'苹果1个+水煮蛋1个+脱脂牛奶200ml',steps:'简单准备即可',kcal:260},
-    lu:{name:'空气炸巴沙鱼+芦笋',detail:'巴沙鱼200g+芦笋150g+柠檬',steps:'鱼排调味，与芦笋同入锅，出锅挤柠檬',airfry:'200℃ 10分钟',kcal:310},
-    di:{name:'凉拌海带丝+水煮蛋',detail:'海带丝150g+水煮蛋1个+蒜醋汁',steps:'海带丝焯2min，加酱汁拌匀',kcal:160}},
-  {day:'周三',bf:{name:'小番茄+猕猴桃+酸奶',detail:'小番茄10颗+猕猴桃1个+无糖酸奶150ml',steps:'水果切块拌入酸奶',kcal:220},
-    lu:{name:'空气炸鸡翅+娃娃菜',detail:'鸡翅中4个+娃娃菜200g',steps:'鸡翅划刀腌制，娃娃菜垫底，同入锅',airfry:'180℃ 20分钟',kcal:375},
-    di:{name:'冬瓜紫菜虾滑汤',detail:'冬瓜200g+紫菜5g+虾滑5个',steps:'冬瓜煮软放虾滑紫菜煮3min',kcal:155}},
-  {day:'周四',bf:{name:'红薯+水煮蛋',detail:'小个红薯1个+水煮蛋1个',steps:'红薯蒸20min至软',kcal:275},
-    lu:{name:'空气炸明虾+西葫芦',detail:'明虾200g+西葫芦1根+蒜末',steps:'虾开背腌制，西葫芦切片，同入锅',airfry:'200℃ 8分钟',kcal:290},
-    di:{name:'菌菇豆腐汤',detail:'香菇3朵+平菇100g+嫩豆腐150g',steps:'菌菇炒香加水煮沸放豆腐3min',kcal:185}},
-  {day:'周五',bf:{name:'香蕉+蓝莓+牛奶',detail:'香蕉1根+蓝莓30g+牛奶200ml',steps:'搅拌成奶昔或分开食用',kcal:280},
-    lu:{name:'空气炸鸡腿肉+秋葵',detail:'去皮鸡腿肉200g+秋葵150g',steps:'鸡腿肉切块腌制，秋葵刷油同入锅',airfry:'190℃ 15分钟',kcal:360},
-    di:{name:'番茄黄瓜沙拉+虾滑',detail:'番茄1个+黄瓜1根+虾滑5个煮熟',steps:'蔬菜切块，虾滑煮熟凉拌',kcal:195}},
-  {day:'周六',bf:{name:'芒果+水煮蛋+酸奶',detail:'芒果半个+水煮蛋1个+无糖酸奶150ml',steps:'芒果切块拌入酸奶',kcal:295},
-    lu:{name:'空气炸牛肉+彩椒洋葱',detail:'牛肉150g+彩椒1个+洋葱半个',steps:'牛肉切条腌制，蔬菜切块同入锅',airfry:'200℃ 8分钟',kcal:340},
-    di:{name:'山药瘦肉汤',detail:'山药200g+猪瘦肉100g+胡萝卜',steps:'瘦肉焯水，与山药胡萝卜煮40min',kcal:255}},
-  {day:'周日',bf:{name:'火龙果+鹌鹑蛋+牛奶',detail:'火龙果半个+鹌鹑蛋5个+牛奶200ml',steps:'火龙果切块，鹌鹑蛋煮熟',kcal:265},
-    lu:{name:'空气炸豆腐+金针菇+灵魂蘸料',detail:'老豆腐200g+金针菇150g',steps:'豆腐切片吸干，金针菇铺底淋酱汁',airfry:'180℃ 15分钟',kcal:305},
-    di:{name:'丝瓜花螺汤',detail:'丝瓜1根+花螺200g+姜片',steps:'丝瓜炒软加水煮沸放花螺5min',kcal:175}},
-];
-
-function renderDiet(){
-  document.getElementById('diet-days').innerHTML=DIET_DAYS.map((d,i)=>`
-    <button class="diet-tab${i===activeDiet?' on':''}" onclick="switchDiet(${i})">${d}</button>
-  `).join('');
-
-  const r=RECIPES[activeDiet];
-  function mealHTML(m,emoji,type,tagCls){
-    return `<div class="day-card">
-      <h4>${emoji} ${type} · 约${m.kcal}kcal</h4>
-      <div class="meal-row">
-        <span class="meal-tag ${tagCls}">${type}</span>
-        <div class="meal-info">
-          <div class="name">${m.name}</div>
-          <div class="detail">${m.detail}</div>
-          <div class="steps">${m.steps}</div>
-          ${m.airfry?`<span class="airfry">🔥 空气炸锅 ${m.airfry}</span>`:''}
-        </div>
-      </div>
-    </div>`;
-  }
-  document.getElementById('diet-content').innerHTML=`
-    <h3>📅 ${r.day}</h3>
-    ${mealHTML(r.bf,'🌅','早餐','bf')}
-    ${mealHTML(r.lu,'☀️','午餐','lu')}
-    ${mealHTML(r.di,'🌙','晚餐','di')}
-    <div style="text-align:center;font-size:.72rem;color:var(--text2);margin-top:8px;">
-      全天预估：${r.bf.kcal+r.lu.kcal+r.di.kcal}kcal
-    </div>`;
-
-  // Shopping list
-  document.getElementById('shopping-list').innerHTML=`
-    <div style="margin-bottom:6px;"><strong>🍎 水果：</strong>${INGREDIENTS.fruit}</div>
-    <div style="margin-bottom:6px;"><strong>🌽 根茎碳水：</strong>${INGREDIENTS.carb}</div>
-    <div style="margin-bottom:6px;"><strong>🥩 肉类蛋白：</strong>${INGREDIENTS.protein}</div>
-    <div style="margin-bottom:6px;"><strong>🥬 蔬菜：</strong>${INGREDIENTS.veg}</div>
-    <div><strong>🧂 灵魂蘸料：</strong>${INGREDIENTS.sauce}</div>`;
-}
-function switchDiet(i){activeDiet=i;renderDiet();}
-
-// ============================================================
-// ================ 4. 简单记账 ==============================
-// ============================================================
-const CATS=['餐饮','交通','购物','住房','娱乐','学习','医疗','人情','其他'];
-const CAT_C=['#FF7043','#42A5F5','#AB47BC','#26A69A','#FFCA28','#5C6BC0','#EF5350','#EC407A','#78909C'];
-
-function getLedger(){const d=load(KEYS.ledger);if(!d.items)d.items=[];return d;}
-
-function renderLedger(){
-  const d=getLedger();const td=today();
-  document.getElementById('ledger-date').value=td;
-
-  // Stats
-  const thisM=new Date().toISOString().slice(0,7);
-  const todayItems=d.items.filter(i=>i.date===td);
-  const monthItems=d.items.filter(i=>i.date.startsWith(thisM));
-  const tExp=todayItems.filter(i=>i.type==='expense').reduce((s,i)=>s+i.amt,0);
-  const tInc=todayItems.filter(i=>i.type==='income').reduce((s,i)=>s+i.amt,0);
-  const mExp=monthItems.filter(i=>i.type==='expense').reduce((s,i)=>s+i.amt,0);
-  const mInc=monthItems.filter(i=>i.type==='income').reduce((s,i)=>s+i.amt,0);
-  document.getElementById('ledger-stats').innerHTML=`
-    <div class="stat-box"><div class="num" style="color:#EF4444;">¥${tExp.toFixed(0)}</div><div class="lbl">今日支出</div></div>
-    <div class="stat-box"><div class="num" style="color:#10B981;">¥${tInc.toFixed(0)}</div><div class="lbl">今日收入</div></div>
-    <div class="stat-box"><div class="num">¥${mExp.toFixed(0)}</div><div class="lbl">本月支出</div></div>
-    <div class="stat-box"><div class="num" style="color:${(mInc-mExp)>=0?'#10B981':'#EF4444'};">¥${(mInc-mExp).toFixed(0)}</div><div class="lbl">本月结余</div></div>`;
-
-  // Category
-  const catMap={};monthItems.filter(i=>i.type==='expense').forEach(i=>{catMap[i.cat]=(catMap[i.cat]||0)+i.amt;});
-  const total=Object.values(catMap).reduce((s,v)=>s+v,0);
-  const cEntries=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-  const bdEl=document.getElementById('cat-breakdown');
-  if(total>0){
-    bdEl.innerHTML=`
-      <div class="cat-bar">${cEntries.map(([cat,amt])=>{
-        const idx=CATS.indexOf(cat);const p=(amt/total*100).toFixed(1);
-        return `<div style="width:${p}%;background:${CAT_C[idx]||'#999'};" title="${cat}: ¥${amt.toFixed(0)}"></div>`;
-      }).join('')}</div>
-      <div class="cat-legend">${cEntries.map(([cat,amt])=>{
-        const idx=CATS.indexOf(cat);
-        return `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:${CAT_C[idx]}"></span>${cat} ¥${amt.toFixed(0)}</span>`;
-      }).join('')}</div>`;
-  }else{bdEl.innerHTML='<div style="font-size:.73rem;color:var(--text2);">本月暂无支出</div>';}
-
-  // List
-  const recent=d.items.slice().reverse().slice(0,25);
-  document.getElementById('ledger-list').innerHTML=recent.length
-    ?recent.map(i=>{
-      const cIdx=CATS.indexOf(i.cat);
-      return `<div class="ledger-item">
-        <span style="font-size:.68rem;color:var(--text2);min-width:50px;">${i.date.slice(5)}</span>
-        <span style="width:7px;height:7px;border-radius:50%;background:${CAT_C[cIdx]||'#999'};flex-shrink:0;"></span>
-        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.item} ${i.note?'·'+i.note:''}</span>
-        <span class="${i.type==='expense'?'amt-exp':'amt-inc'}">${i.type==='expense'?'-':'+'}¥${i.amt.toFixed(2)}</span>
-        <button class="btn-del" onclick="delLedger('${i.id}')">×</button>
-      </div>`;
-    }).join('')
-    :'<div style="font-size:.73rem;color:var(--text2);">暂无记录，开始记账吧 💰</div>';
-}
-
-function addLedger(){
-  const date=document.getElementById('ledger-date').value||today();
-  const item=document.getElementById('ledger-item').value.trim();
-  const amt=parseFloat(document.getElementById('ledger-amt').value);
-  const type=document.getElementById('ledger-type').value;
-  const note=document.getElementById('ledger-note').value.trim();
-  if(!item||!amt||amt<=0){toast('⚠️ 请填写项目和有效金额');return;}
-  // Auto-categorize
-  let cat='其他';
-  if(item.includes('饭')||item.includes('餐')||item.includes('奶茶')||item.includes('咖啡'))cat='餐饮';
-  else if(item.includes('车')||item.includes('地铁')||item.includes('公交')||item.includes('油'))cat='交通';
-  else if(item.includes('衣服')||item.includes('鞋')||item.includes('淘宝')||item.includes('京东'))cat='购物';
-  else if(item.includes('租')||item.includes('房贷')||item.includes('水电'))cat='住房';
-  else if(item.includes('电影')||item.includes('游戏')||item.includes('KTV'))cat='娱乐';
-  else if(item.includes('书')||item.includes('课')||item.includes('课程'))cat='学习';
-  else if(item.includes('药')||item.includes('医院'))cat='医疗';
-  else if(item.includes('红包')||item.includes('礼物'))cat='人情';
-
-  const d=getLedger();
-  d.items.push({id:Date.now().toString(),date,item,amt,type,cat,note});
-  save(KEYS.ledger,d);
-  document.getElementById('ledger-item').value='';document.getElementById('ledger-amt').value='';
-  document.getElementById('ledger-note').value='';
-  toast('✅ 记账成功');renderLedger();
-}
-function delLedger(id){
-  const d=getLedger();d.items=d.items.filter(i=>i.id!==id);
-  save(KEYS.ledger,d);renderLedger();
-}
-
-// ============================================================
-// ================ 5. 爆款二创 V2 ============================
-// ============================================================
-
-// ===== 今日灵感 (日期驱动) =====
-function fetchTodayInspiration(){
-  const d=new Date();const m=d.getMonth()+1;const day=d.getDate();
-  const near=[];
-  const events={
-    '1-1':'元旦 · 新年计划','2-14':'情人节 · 礼物季','3-8':'女神节 · 她经济',
-    '4-1':'愚人节 · 趣味营销','5-1':'劳动节 · 假日经济','6-1':'儿童节 · 亲子经济',
-    '6-18':'618大促 · 电商狂欢','7-20':'暑期档 · 学生经济','8-8':'全民健身日',
-    '9-1':'开学季 · 文具高峰','9-10':'教师节 · 感恩营销','10-1':'国庆黄金周',
-    '11-11':'双十一 · 全球狂欢','12-12':'双十二 · 年终大促','12-25':'圣诞节',
-  };
-  const todayKey=`${m}-${day}`;
-  for(let i=0;i<7;i++){const nd=new Date(d);nd.setDate(nd.getDate()+i);const nk=`${nd.getMonth()+1}-${nd.getDate()}`;if(events[nk])near.push({key:nk,name:events[nk],diff:i});}
-  const hook=near.length>0?near[0]:{diff:0,name:'日常好物推荐'};
-  const hookText=near.length>0?(near[0].diff===0?'今天就是❗':'距离还有 '+(near[0].diff)+' 天'):'';
-
-  const getInspMsg=()=>{if(m>=6&&m<=8)return '暑期消费力爆发，学习、旅行、避暑三大场景叠加';if(m===9)return '开学季黄金窗口，文具+灯具+学习周边全品类爆发';if(m===1)return '新年计划季，自律类、手账类、学习工具类需求大涨';if(m>=11||m<=2)return '秋冬养生+送礼季，茶叶+礼盒+暖冬好物正当时';return '日常内容深耕期，积累素材、打磨人设的好时机';};
-  const getVidIdeas=()=>{if(m>=6&&m<=8)return ['暑假学习vlog（文具+护眼灯出镜）','户外露营泡茶体验','夏日居家好物开箱'];if(m===9)return ['开学学习桌改造','开学文具红黑榜测评','学习博主一日routine'];return ['沉浸式学习/工作vlog','好物开箱+测评对比','垂直品类知识科普'];};
-  const getProdIdeas=()=>{if(m>=6&&m<=8)return ['冷泡茶礼盒','护眼台灯+便携学习套装','高颜值文具盲盒'];if(m===9)return ['开学文具大礼包','智能学习笔+练习本套装','桌面收纳神器'];return ['国潮文具套装','氛围灯具','养生茶礼盒'];};
-
-  return {dateStr:todayKey,events:near.slice(0,3),primaryEvent:hook,hookText,inspiration:{message:getInspMsg(),videoIdeas:getVidIdeas(),productIdeas:getProdIdeas()}};
-}
-
-// ===== 文具品类数据 =====
-function fetchStationeryData(){
-  return {cat:'文具',icon:'✏️',color:'#4F46E5',catName:'文具品类',hotTopics:[
-    {title:'国潮笔记本套装',val:'↑ 238%',note:'近7天搜索趋势',heatLevel:95,tags:[{label:'🔥热搜',type:'hot'},{label:'送礼',type:'green'}],remixIdea:'抓住"写字解压"情绪，用沉浸式练字内容种草，手写体的治愈感天然适合短视频',actionSteps:['拍摄一支 30 秒"开笔-蘸墨-落笔"沉浸视频，标题《这一刻世界安静了》','在笔记本书页里夹入一枚干花或茶包，打"写字+喝茶"生活方式标签','评论区引导："你上一次手写字是什么时候？"制造互动']},
-    {title:'复古钢笔礼盒',val:'↑ 185%',note:'送礼场景热词',heatLevel:82,tags:[{label:'💡蓝海',type:'blue'},{label:'送礼',type:'green'}],remixIdea:'开学季+教师节双驱动，做"我的第一支钢笔"回忆杀内容，情感共鸣转化率高',actionSteps:['拍"从小到大用过的笔"回忆向短视频，结尾推复古钢笔','做教师节送礼专题："适合送老师的 5 支钢笔，第 3 支有彩蛋"','挂商品链接时强调"刻字定制服务"，提升客单价']},
-    {title:'解压文具系列',val:'↑ 156%',note:'Z世代热搜',heatLevel:78,tags:[{label:'🔥热搜',type:'hot'},{label:'Z世代',type:'blue'}],remixIdea:'捏捏乐笔、减压本等情绪价值文具当道，做解压测评类内容最容易出圈',actionSteps:['拍"5 款解压文具开箱"横向测评，压缩到 60 秒内完播率高','做 ASMR 风格内容：捏泥声、刮画声、翻页声，平台推荐自带流量','标题党公式："上班/上课必带的解压小物，第 4 个我买了 3 个"']},
-  ]};
-}
-
-// ===== 灯具品类数据 =====
-function fetchLightingData(){
-  return {cat:'灯具',icon:'💡',color:'#F59E0B',catName:'灯具品类',hotTopics:[
-    {title:'全光谱护眼台灯',val:'↑ 210%',note:'开学季爆款',heatLevel:92,tags:[{label:'🔥热搜',type:'hot'},{label:'家长群体',type:'blue'}],remixIdea:'家长对"视力保护"焦虑是天然痛点，做对比实测类内容，用数据说话转化率最高',actionSteps:['拍"普通台灯 vs 全光谱台灯"照度仪实测对比，数据可视化','邀请你家娃出镜"写作业"场景，强调"无频闪不伤眼"','评论区预埋关键词回复："这款适合几岁孩子？"引导搜索']},
-    {title:'氛围落日灯',val:'↑ 178%',note:'小红书种草',heatLevel:85,tags:[{label:'💡蓝海',type:'blue'},{label:'种草',type:'green'}],remixIdea:'落日灯是"拍照神器"定位，做场景化内容——卧室一角 + 日落灯 + 一本书 = 小红书万赞素材',actionSteps:['拍"一个落日灯改造一面墙"前后对比，视觉冲击拉满','做"落日灯 × 不同风格"系列：极简风/复古风/少女风','加链接时打"百元以内"价格锚点，降低决策门槛']},
-    {title:'磁吸轨道灯',val:'↑ 145%',note:'装修热搜',heatLevel:72,tags:[{label:'💡蓝海',type:'blue'}],remixIdea:'无主灯设计是装修圈顶流话题，做"我家装修踩过的坑"反向科普内容',actionSteps:['做"无主灯翻车 vs 正确安装"对比图/视频','出一期"磁吸轨道灯选购指南"，拆解色温、显色指数、瓦数','评论区收集"你家装修用的是什么灯"做二次选题来源']},
-  ]};
-}
-
-// ===== 茶叶品类数据 =====
-function fetchTeaData(){
-  return {cat:'茶叶',icon:'🍵',color:'#10B981',catName:'茶叶品类',hotTopics:[
-    {title:'冷泡茶套装',val:'↑ 256%',note:'夏季爆品',heatLevel:97,tags:[{label:'🔥热搜',type:'hot'},{label:'夏季限定',type:'green'}],remixIdea:'夏天是冷泡茶黄金期，做"A vs B 口味盲测"内容，互动率高且容易引导购买',actionSteps:['拍"白桃乌龙 vs 葡萄煎茶"冷泡盲测，记录同事表情反应','做"1 分钟教你做便利店冷泡茶"教程，门槛低、可复制性强','挂"买 3 送 1 冷泡杯"组合链接，提升客单价和复购']},
-    {title:'陈皮白茶小方片',val:'↑ 198%',note:'办公室热词',heatLevel:86,tags:[{label:'🔥热搜',type:'hot'},{label:'养生',type:'green'}],remixIdea:'"办公桌养生"是打工人核心场景，做"我的办公桌茶包合集"最容易种草',actionSteps:['拍"打工人办公桌茶包测评"，突出独立包装+一泡一天的便捷性','找"养生"和"续命"两个情绪关键词，做对比型内容','备注"咖啡喝腻了试试这个"做关联转化']},
-    {title:'围炉煮茶器具',val:'↑ 167%',note:'社交场景',heatLevel:70,tags:[{label:'💡蓝海',type:'blue'},{label:'社交',type:'green'}],remixIdea:'秋冬场景提前布局，现在做预热内容，9 月起量时你已经有排名优势',actionSteps:['拍"在家围炉煮茶"氛围视频，强调"朋友聚会新方式"','做"围炉煮茶必备清单"图文攻略，瓷器+茶叶+炭炉一站种草','评论区引导："约上谁来一起？"@ 好友裂变']},
-  ]};
-}
-
-// ===== 渲染单个品类 =====
-function renderTrendCards(data,cardId){
-  const {cat,icon,color,catName,hotTopics}=data;
-  const card=document.getElementById(cardId);if(!card)return;
-  let html=`<h3>${icon} ${catName} · <span style="font-size:.72rem;color:var(--text2);">热点 + 二创切入点</span></h3>`;
-  hotTopics.forEach(t=>{
-    const hbc=t.heatLevel>85?'heat-bar-hot':t.heatLevel>70?'heat-bar-rising':'heat-bar-stable';
-    html+=`
-    <div class="trend-card" style="margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-        <div class="t-cat" style="color:${color};">${cat}</div>
-        <span class="t-val" style="color:${color};font-size:1rem;">${t.val}</span>
-        <span class="t-note">${t.note}</span>
-        ${t.tags.map(tg=>`<span class="tag tag-${tg.type}">${tg.label}</span>`).join('')}
-      </div>
-      <div class="t-title">📈 ${t.title}</div>
-      <div class="heat-bar-wrap"><div class="heat-bar-fill ${hbc}" style="width:${t.heatLevel}%;"></div></div>
-      <div style="font-size:.65rem;color:var(--text2);margin-top:2px;">热度指数：${t.heatLevel}/100</div>
-      <div class="remix-block">
-        <div class="remix-label">💡 二创切入点</div>
-        <div class="remix-title">${t.remixIdea}</div>
-        <div class="remix-steps">
-          ${t.actionSteps.map((s,si)=>`<div class="remix-step"><span class="remix-step-num">${si+1}</span><span>${s}</span></div>`).join('')}
-        </div>
-      </div>
-    </div>`;
-  });
-  card.innerHTML=html;
-}
-
-// ===== 主渲染 =====
-function renderTrending(){
-  // 今日灵感
-  const insp=fetchTodayInspiration(),ie=insp.inspiration,ep=insp.primaryEvent;
-  document.getElementById('today-inspire').innerHTML=`
-    <div class="inspire-icon">💡</div>
-    <div class="inspire-body">
-      <div class="inspire-date">${new Date().getFullYear()}年${new Date().getMonth()+1}月${new Date().getDate()}日 · ${ep.diff===0?'今天就是':insp.hookText} <b>${ep.name}</b></div>
-      <div class="inspire-hook">${ie.message}</div>
-      <div class="inspire-actions">
-        ${ie.videoIdeas.map(v=>`<span class="inspire-tag inspire-video">🎬 ${v}</span>`).join('')}
-        ${ie.productIdeas.map(p=>`<span class="inspire-tag inspire-product">🛍️ ${p}</span>`).join('')}
-      </div>
-      ${insp.events.length>0?`<div style="font-size:.65rem;color:var(--text2);margin-top:6px;">📅 近期可借势节点：${insp.events.map(e=>e.name).join(' · ')}</div>`:''}
-    </div>`;
-
-  renderTrendCards(fetchStationeryData(),'trend-stationery-card');
-  renderTrendCards(fetchLightingData(),'trend-lighting-card');
-  renderTrendCards(fetchTeaData(),'trend-tea-card');
-
-  // 跨界灵感
-  document.getElementById('trend-inspiration').innerHTML=`
-    <div class="card" style="margin-bottom:8px;padding:14px;border-left:4px solid #4F46E5;background:#FAFBFC;">
-      <div style="font-weight:700;font-size:.78rem;">🎨 文具 × 茶叶 · 写字喝茶治愈系</div>
-      <div style="font-size:.7rem;color:var(--text2);margin-top:4px;">
-        结合「国潮笔记本」+「冷泡茶」趋势，做"学习+饮茶"日常 vlog。拍摄方向：手写笔记→泡茶→阅读，暖色调滤镜，BGM用轻音乐，目标受众是有学习焦虑的年轻女性。
-      </div>
-      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-        <span style="font-size:.62rem;background:#EEF2FF;color:#4F46E5;padding:2px 8px;border-radius:10px;">#写字喝茶</span>
-        <span style="font-size:.62rem;background:#EEF2FF;color:#4F46E5;padding:2px 8px;border-radius:10px;">#学习vlog</span>
-        <span style="font-size:.62rem;background:#EEF2FF;color:#4F46E5;padding:2px 8px;border-radius:10px;">#国潮文具</span>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:8px;padding:14px;border-left:4px solid #F59E0B;background:#FAFBFC;">
-      <div style="font-weight:700;font-size:.78rem;">🏠 灯具 × 文具 · 学习桌改造</div>
-      <div style="font-size:.7rem;color:var(--text2);margin-top:4px;">
-        「全光谱护眼灯+桌面文具收纳」打包做学习桌改造内容，开学季/考研季精准触达。拍摄方向：改造前 vs 改造后对比，植入台灯+文具的实用效果展示。
-      </div>
-      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-        <span style="font-size:.62rem;background:#FEF3C7;color:#D97706;padding:2px 8px;border-radius:10px;">#学习桌改造</span>
-        <span style="font-size:.62rem;background:#FEF3C7;color:#D97706;padding:2px 8px;border-radius:10px;">#护眼灯推荐</span>
-        <span style="font-size:.62rem;background:#FEF3C7;color:#D97706;padding:2px 8px;border-radius:10px;">#学习好物</span>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:8px;padding:14px;border-left:4px solid #10B981;background:#FAFBFC;">
-      <div style="font-weight:700;font-size:.78rem;">📦 茶叶 × 露营 · 户外泡茶</div>
-      <div style="font-size:.7rem;color:var(--text2);margin-top:4px;">
-        「户外泡茶」场景内容，便携茶具+冷泡茶+露营灯，打造户外生活方式矩阵。拍摄方向：露营时泡一壶茶，强调"比喝酒健康、比喝咖啡惬意"的差异化定位。
-      </div>
-      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-        <span style="font-size:.62rem;background:#D1FAE5;color:#059669;padding:2px 8px;border-radius:10px;">#户外泡茶</span>
-        <span style="font-size:.62rem;background:#D1FAE5;color:#059669;padding:2px 8px;border-radius:10px;">#露营生活</span>
-        <span style="font-size:.62rem;background:#D1FAE5;color:#059669;padding:2px 8px;border-radius:10px;">#冷泡茶推荐</span>
-      </div>
-    </div>`;
-}
-
-function refreshTrending(){
-  toast('🔄 热点数据已刷新');
-  renderTrending();
-}
-
-// ============================================================
-// ==================== MULTI-SUBJECT LEARNING ================
-// ============================================================
-const MULTI_GOAL_SPECIFICS={
-  english:{
-    name:'🇬🇧 英语口语',icon:'🇬🇧',
-    whatTpl:['学习 {n} 个核心场景词汇（{topic}）','跟读模仿 3 分钟英文短句','录音自听，对比纠正发音'],
-    howTpl:['打开手机录音，跟读今日词汇各 5 遍，播回对比原音','用新词造 3 个句子并大声读出来'],
-    knowledge:['英语学习三循环：输入 → 处理 → 输出。口语差=输出环节练得少','发音关键：元音饱满、辅音轻快，重音和节奏比单个音标更重要','连读规则：辅音+元音连读（This-is），音的同化','常见时态速记：现在完成时=have/has+过去分词，表示过去动作对现在的影响','影子跟读法：比原音延迟0.5秒跟读，同时训练听力+口语'],
-    tests:{
-      beginner:[{q:'如何用英语自我介绍？',type:'open'},{q:'"I have been learning English for two years." 这个时态是？',opts:['一般现在时','现在完成时','过去进行时'],ans:1}],
-      easy:[{q:'请翻译：我已经学英语两年了',type:'open'},{q:'"She doesn\'t like coffee." 改为一般疑问句？',opts:['Does she likes coffee?','Does she like coffee?','Do she like coffee?'],ans:1}],
-      medium:[{q:'过去完成时 vs 现在完成时的区别是什么？',type:'open'},{q:'If I ___ rich, I would travel the world.',opts:['am','was','were'],ans:2}],
-      hard:[{q:'用英语描述你昨天做的三件事（至少用2种不同时态）',type:'open'},{q:'By the time we arrive, the movie ___ already ___.',opts:['will/start','will/have started','has/started'],ans:1}]
-    },
-    scenarios:['自我介绍','餐厅点餐','问路指路','购物聊天','电话沟通']
-  },
-  fitness:{
-    name:'🏃 有氧健身',icon:'🏃',
-    whatTpl:['完成 {n} 分钟有氧运动','完成 3 组核心拉伸/力量动作','记录心率、感受和身体状态'],
-    howTpl:['先做 3 分钟动态热身（开合跳 30 个 + 高抬腿 30 秒 + 肩绕环）','运动时用手机计时，每组间休息不超过 60 秒'],
-    knowledge:['减脂核心原理：热量缺口 = 消耗 > 摄入','燃脂心率 ≈ (220-年龄)×60%~70%','有氧 vs 无氧区别：有氧燃烧脂肪+糖，无氧主要烧糖','HIIT好处：运动后24h持续燃脂（后燃效应EPOC）'],
-    tests:{
-      beginner:[{q:'减脂的基本原理是？',opts:['不吃晚饭','热量消耗>热量摄入','只吃水果'],ans:1},{q:'做完今天的 15 分钟快走',type:'action',desc:'实操：15分钟快走打卡'}],
-      easy:[{q:'有氧运动主要消耗什么能量？',opts:['蛋白质为主','脂肪+糖','只消耗水分'],ans:1},{q:'做完今天的 20 分钟有氧+3组深蹲',type:'action'}],
-      medium:[{q:'HIIT 的优势是？',opts:['运动时间最长','有后燃效应EPOC','不用热身'],ans:1},{q:'完成 25 分钟HIIT训练',type:'action'}],
-      hard:[{q:'心率达到最大心率多少是燃脂区间？',opts:['30-40%','60-70%','80-90%'],ans:1},{q:'完成 35 分钟高强度间歇训练',type:'action'}]
-    }
-  },
-  tea:{
-    name:'🍵 茶艺师',icon:'🍵',
-    whatTpl:['了解 {n} 个茶类基础知识','观看 5 分钟教学视频','记录今日学习笔记'],
-    howTpl:['观看茶艺入门视频','用笔记软件整理茶类分类图或知识卡片'],
-    knowledge:['中国六大茶类：绿茶不发酵、白茶微发酵、黄茶轻发酵、乌龙茶半发酵、红茶全发酵、黑茶后发酵','绿茶代表：龙井、碧螺春、毛峰','红茶代表：正山小种、金骏眉、祁红','乌龙茶代表：铁观音、大红袍、凤凰单丛','泡茶三要素：茶水比、水温、冲泡时间'],
-    tests:{
-      beginner:[{q:'中国六大茶类中，不发酵的是？',opts:['红茶','绿茶','乌龙茶'],ans:1},{q:'今天的任务：整理六大茶类分类表',type:'action'}],
-      easy:[{q:'铁观音属于什么茶？',opts:['绿茶','乌龙茶','红茶'],ans:1},{q:'泡绿茶的最佳水温是多少？',opts:['60°C','80°C','100°C'],ans:1}],
-      medium:[{q:'乌龙茶制茶工艺中特有的步骤是？',opts:['发酵','摇青','杀青'],ans:1},{q:'今天泡一杯茶并记录茶汤颜色和口感',type:'action'}],
-      hard:[{q:'紫砂壶最适合泡什么类型的茶？',opts:['绿茶','乌龙茶/普洱','花茶'],ans:1},{q:'用盖碗完成一整套冲泡流程并录像',type:'action'}]
-    }
-  },
-  accounting:{
-    name:'📊 初级会计',icon:'📊',
-    whatTpl:['学习 {n} 个核心会计概念/分录','做 5 道练习题','整理错题笔记'],
-    howTpl:['先通读教材对应章节（约 10 分钟）','做练习题时不看书，做完统一对答案，错题重点标注'],
-    knowledge:['会计恒等式：资产 = 负债 + 所有者权益','资产=过去交易形成的、企业拥有或控制的、预期带来经济利益的资源','负债=过去交易形成的、预期导致经济利益流出的现时义务','借贷记账法：资产+费用=借增贷减；负债+权益+收入=借减贷增','应收账款是资产，应付账款是负债'],
-    tests:{
-      beginner:[{q:'会计恒等式是什么？',opts:['收入=费用+利润','资产=负债+所有者权益','资产=收入+利润'],ans:1},{q:'应收账款属于什么科目？',opts:['资产','负债','所有者权益'],ans:0}],
-      easy:[{q:'收到现金100万，会计分录怎么记？',opts:['借:现金 贷:收入','借:银行 贷:应收','借:收入 贷:现金'],ans:0},{q:'张三有现金5000、欠债2000、固定资产10000，求净资产',type:'open'}],
-      medium:[{q:'预收账款属于什么科目？',opts:['资产','负债','所有者权益'],ans:1},{q:'编制本期3笔业务的会计分录',type:'open'}],
-      hard:[{q:'资产减值准备的会计处理原则是？',opts:['权责发生制','谨慎性原则','重要性原则'],ans:1},{q:'完整编制一页资产负债表',type:'open'}]
-    }
-  },
-  ukulele:{
-    name:'🎸 尤克里里',icon:'🎸',
-    whatTpl:['练习基础指法/和弦','跟节拍器弹奏节奏型 {n} 次','录制练习视频自检'],
-    howTpl:['调音后再练（用 GuitarTuna 或调音器）','先慢速练熟，再逐步加速，不对的地方回退重新慢练'],
-    knowledge:['四弦音名：4弦G→3弦C→2弦E→1弦A，口诀：Good Children Eat Apples','持琴三要点：背挺直、琴身贴胸、左手托琴颈不握死','C大调和弦：C、Am、F、G','扫弦节奏四型：↓ ↓ ↑ ↑ ↓ ↑等','爬格子练习：1234指法每天5分钟'],
-    tests:{
-      beginner:[{q:'尤克里里4弦（最上面那根）空弦音是？',opts:['A','G','C'],ans:1},{q:'调准琴后右手拇指拨4→3→2→1弦，录30秒',type:'action'}],
-      easy:[{q:'C和弦按法哪个是正确的？',opts:['无名指按1弦3品','食指按1弦1品','全部不按'],ans:0},{q:'完成 C→Am→F→G 和弦转换练习5遍',type:'action'}],
-      medium:[{q:'刷弦时，右手应该用哪个部位？',opts:['手掌','食指指甲/指腹','手腕'],ans:1},{q:'用 ↓↓↑↑↓↑ 节奏型扫 《小星星》',type:'action'}],
-      hard:[{q:'弹唱时如何做到和弦和唱词同步？',opts:['先练熟和弦再练唱','同时进行','不用练和弦'],ans:0},{q:'完整弹唱一首 C大调歌曲并录像',type:'action'}]
-    }
-  }
-};
-
-const MULTI_SUBJECTS=['english','fitness','tea','accounting','ukulele'];
-const MULTI_LEVELS=['beginner','easy','medium','hard'];
-const MULTI_STORAGE_KEY='multi_learn_data';
-let multiCurrentSubject='english';
-let multiData=null;
-
-function initMultiData(){
-  const raw=localStorage.getItem(MULTI_STORAGE_KEY);
-  if(raw){multiData=JSON.parse(raw);return;}
-  multiData={subjects:{}};
-  MULTI_SUBJECTS.forEach(s=>{multiData.subjects[s]={currentLevel:'beginner',records:{},lastAdjust:''};});
-  saveMultiData();
-}
-function saveMultiData(){localStorage.setItem(MULTI_STORAGE_KEY,JSON.stringify(multiData));}
-function getMultiSubjectData(){return multiData.subjects[multiCurrentSubject];}
-function getMultiDayNumber(){return Object.keys(getMultiSubjectData().records).length+1;}
-function adjustMultiDifficulty(subject,direction){
-  const sd=multiData.subjects[subject],td=today();
-  if(sd.lastAdjust===td)return;
-  const idx=MULTI_LEVELS.indexOf(sd.currentLevel);
-  if(direction==='up'&&idx<MULTI_LEVELS.length-1)sd.currentLevel=MULTI_LEVELS[idx+1];
-  if(direction==='down'&&idx>0)sd.currentLevel=MULTI_LEVELS[idx-1];
-  sd.lastAdjust=td;saveMultiData();
-}
-
-function generateMultiSOP(subject){
-  const sd=multiData.subjects[subject],g=MULTI_GOAL_SPECIFICS[subject],dayNum=getMultiDayNumber(),level=sd.currentLevel;
-  const kIdx=(dayNum-1)%g.knowledge.length;
-  const knowledgeItems=[g.knowledge[kIdx]];
-  if(dayNum%2===0&&g.knowledge.length>1)knowledgeItems.push(g.knowledge[(kIdx+1)%g.knowledge.length]);
-  const testItems=(g.tests[level]||g.tests.beginner).slice();
-  let whatItems=[...g.whatTpl];
-  if(subject==='english'){
-    const scIdx=(dayNum-1)%g.scenarios.length;
-    whatItems=whatItems.map(t=>t.replace('{topic}',g.scenarios[scIdx]));
-  }
-  whatItems=whatItems.map(t=>t.replace('{n}',Math.min(dayNum+1,5).toString()));
-  return {subject,dayNum,level,gName:g.name,gIcon:g.icon,whatItems,howItems:[...g.howTpl],knowledgeItems,testItems};
-}
-
-function renderMultiSubject(){
-  initMultiData();
-  renderMultiTabs();
-  renderMultiDay();
-  renderMultiHeatmap();
-  renderMultiStats();
-}
-function renderMultiTabs(){
-  const c=document.getElementById('multi-tabs');
-  c.innerHTML=MULTI_SUBJECTS.map(s=>{
-    const g=MULTI_GOAL_SPECIFICS[s],sd=multiData.subjects[s],count=Object.keys(sd.records).length;
-    const is=s===multiCurrentSubject?' active':'';
-    const lvl=sd.currentLevel==='beginner'?'入门':sd.currentLevel==='easy'?'基础':sd.currentLevel==='medium'?'进阶':'挑战';
-    return `<div class="multi-tab${is}" data-subject="${s}" onclick="switchMultiSubject('${s}')">${g.icon} ${g.name.split(' ')[1]} <span class="badge">${lvl} · ${count}天</span></div>`;
-  }).join('');
-}
-function switchMultiSubject(subject){
-  multiCurrentSubject=subject;
-  renderMultiSubject();
-  document.querySelectorAll('#panel-multisubject .multi-sop').forEach(s=>s.classList.add('open'));
-}
-function renderMultiDay(){
-  const sop=generateMultiSOP(multiCurrentSubject),sd=getMultiSubjectData(),td=today();
-  document.getElementById('multi-day-pill').textContent=`📖 第 ${sop.dayNum} 天`;
-  const lvlCn={beginner:'🌱 入门',easy:'🌿 基础',medium:'🌳 进阶',hard:'🔥 挑战'};
-  document.getElementById('multi-level-pill').innerHTML=`<span class="lvl-pill lvl-${sop.level}">${sop.gIcon} ${sop.gName} · ${lvlCn[sop.level]}</span>`;
-  const sections=[
-    {id:'what',label:'做什么',icon:'📋',items:sop.whatItems},
-    {id:'how',label:'怎么做',icon:'🔧',items:sop.howItems},
-    {id:'knowledge',label:'核心知识点',icon:'💡',items:sop.knowledgeItems}
-  ];
-  let html=sections.map(sec=>`
-    <div class="multi-sop open" id="msop-${sec.id}">
-      <div class="multi-sop-head" onclick="toggleMultiSop('msop-${sec.id}')">
-        <span>${sec.icon}</span><span>${sec.label}</span><span style="margin-left:auto;font-size:.7rem;color:var(--text2);font-weight:500;">${sec.items.length}项</span><span class="arrow">▼</span>
-      </div>
-      <div class="multi-sop-body"><ul>${sec.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>
-    </div>`).join('');
-  html+=`<div class="multi-sop open" id="msop-test">
-    <div class="multi-sop-head" onclick="toggleMultiSop('msop-test')">
-      <span>✅</span><span>每日考核</span><span style="margin-left:auto;font-size:.7rem;color:var(--text2);font-weight:500;">${sop.testItems.length}道题目</span><span class="arrow">▼</span>
-    </div>
-    <div class="multi-sop-body">${sop.testItems.map((t,i)=>renderMultiTestItem(t,i)).join('')}</div>
-  </div>`;
-  document.getElementById('multi-sop-container').innerHTML=html;
-
-  const has=sd.records[td];
-  const act=document.getElementById('multi-actions');
-  if(has==='easy')act.innerHTML='<div class="btn" style="background:#10B981;color:#fff;cursor:default;">✅ 今日已达标 · 明天难度+1</div>';
-  else if(has==='hard')act.innerHTML='<div class="btn" style="background:#F59E0B;color:#fff;cursor:default;">📝 今日已记录 · 明天难度-1</div>';
-  else act.innerHTML=`<button class="btn btn-success" onclick="doMultiCheckin('easy')">✅ 轻松达标！明天加难度</button><button class="btn btn-danger" onclick="doMultiCheckin('hard')">❌ 太难了！明天减难度</button>`;
-}
-function renderMultiTestItem(t,idx){
-  if(t.type==='open')return `<div class="multi-qz"><div class="q">📝 ${t.q}</div><textarea placeholder="写下你的答案..." style="width:100%;min-height:52px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:8px;font-size:.72rem;color:var(--text);font-family:inherit;resize:vertical;"></textarea><button class="btn btn-sm" style="margin-top:6px;" onclick="checkMultiShortAnswer(this,${idx})">🔍 自检完成</button><span class="multi-feedback" id="mfb-${idx}"></span></div>`;
-  if(t.type==='action')return `<div class="multi-qz"><div class="q">🏃 实操：${t.desc||t.q}</div><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.72rem;color:var(--text2);"><input type="checkbox" onchange="this.parentElement.style.color=this.checked?'#10B981':'var(--text2)'"> 我已完成此任务</label></div>`;
-  return `<div class="multi-qz" id="mqz-${idx}"><div class="q">📌 ${t.q}</div>${t.opts.map((o,oi)=>`<button class="multi-opt" onclick="pickMultiAnswer(this,${idx},${oi},${t.ans})">${'ABCD'[oi]}. ${o}</button>`).join('')}</div>`;
-}
-function toggleMultiSop(id){document.getElementById(id).classList.toggle('open');}
-function pickMultiAnswer(el,qIdx,optIdx,correctIdx){
-  const q=document.getElementById('mqz-'+qIdx);if(!q)return;
-  q.querySelectorAll('.multi-opt').forEach(o=>o.classList.add('locked'));
-  q.querySelectorAll('.multi-opt').forEach((o,i)=>{
-    if(i===correctIdx)o.classList.add('correct');
-    else if(i===optIdx&&i!==correctIdx)o.classList.add('wrong');
-  });
-}
-function checkMultiShortAnswer(btn,idx){
-  btn.textContent='✅ 已确认';btn.disabled=true;btn.style.background='#10B981';btn.style.color='#fff';
-  const fb=document.getElementById('mfb-'+idx);if(fb)fb.textContent='自检完成，继续保持！';
-}
-function doMultiCheckin(type){
-  const sd=getMultiSubjectData(),td=today();
-  if(sd.records[td])return;
-  sd.records[td]=type;
-  adjustMultiDifficulty(multiCurrentSubject,type==='easy'?'up':'down'); // 内部已含 saveMultiData
-  if(type==='easy')launchConfetti();
-  else toast('明天自动降低难度，加油！');
-  renderMultiSubject();
-  setTimeout(()=>document.querySelectorAll('#panel-multisubject .multi-sop').forEach(s=>s.classList.add('open')),100);
-}
-function renderMultiHeatmap(){
-  const grid=document.getElementById('multi-heatmap'),td=today();
-  const allDates=new Set(),easyDates=new Set(),hardDates=new Set();
-  MULTI_SUBJECTS.forEach(s=>{
-    Object.entries(multiData.subjects[s].records).forEach(([d,t])=>{allDates.add(d);if(t==='easy')easyDates.add(d);if(t==='hard')hardDates.add(d);});
-  });
-  const dates=[];const start=new Date(td);start.setDate(start.getDate()-364);
-  for(let i=0;i<365;i++){const d=new Date(start);d.setDate(d.getDate()+i);dates.push(d.toISOString().slice(0,10));}
-  grid.innerHTML=dates.map(d=>{
-    let cls='';if(easyDates.has(d))cls=' easy';else if(hardDates.has(d))cls=' hard';
-    if(d===td)cls+=' today';
-    return `<div class="d${cls}" title="${d}"></div>`;
-  }).join('');
-  document.getElementById('multi-progress-bar').style.width=Math.min(100,(allDates.size/365)*100)+'%';
-  document.getElementById('multi-progress-text').textContent=`进度 ${allDates.size}/365 天`;
-}
-function renderMultiStats(){
-  let easy=0,hard=0;const all=new Set();
-  MULTI_SUBJECTS.forEach(s=>{
-    Object.entries(multiData.subjects[s].records).forEach(([d,t])=>{all.add(d);if(t==='easy')easy++;if(t==='hard')hard++;});
-  });
-  const total=easy+hard;
-  document.getElementById('multi-stat-day').textContent=all.size;
-  document.getElementById('multi-stat-easy').textContent=easy;
-  document.getElementById('multi-stat-hard').textContent=hard;
-  document.getElementById('multi-stat-rate').textContent=total>0?Math.round(easy/total*100)+'%':'-';
-}
-
-// ============================================================
-// ==================== INIT =================================
-// ============================================================
-function init(){
-  renderMultiSubject();
-  renderJournal();
-}
-
-// ============================================================
-// ================ Boot ======================================
-// ============================================================
-init();
-</script>
-</body>
-</html>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成长记录 · 1000工作台</title>
+    <!-- canvas-confetti CDN 用于礼花动画 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    <style>
+        /* ===== CSS Reset & Variables ===== */
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --sidebar-w:210px;
+            --bg:#EBF4FC;--card-bg:#fff;--text:#1A2D4A;--text2:#5A718C;
+            --accent:#3B82F6;--accent-light:#EFF6FF;
+            --success:#10B981;--danger:#EF4444;--warn:#F59E0B;
+            --border:rgba(59,130,246,.06);
+            --shadow:0 1px 3px rgba(59,130,246,.05),0 4px 16px rgba(59,130,246,.06);
+            --radius:14px;--radius-sm:10px;
+            /* 彩虹色系 */
+            --rainbow-1:#FF6B6B;--rainbow-2:#FFA94D;--rainbow-3:#FFD43B;
+            --rainbow-4:#69DB7C;--rainbow-5:#4DABF7;--rainbow-6:#748FFC;--rainbow-7:#DA77F2;
+        }
+        html{font-size:16px;}
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+            background:linear-gradient(135deg,#E3F0FD 0%,#F0F4FF 30%,#FDF2F8 60%,#FFF7ED 100%);
+            background-attachment:fixed;
+            color:var(--text);line-height:1.6;overflow:hidden;height:100dvh;
+            -webkit-font-smoothing:antialiased;
+        }
+        a{color:inherit;text-decoration:none;}
+        /* ===== Layout ===== */
+        #app{display:flex;height:100dvh;}
+        /* ===== Sidebar ===== */
+        #sidebar{
+            width:var(--sidebar-w);min-width:var(--sidebar-w);
+            background:linear-gradient(180deg,#1E3A5F 0%,#2563EB 40%,#3B82F6 70%,#60A5FA 100%);
+            display:flex;flex-direction:column;padding:20px 12px;
+            gap:3px;overflow-y:auto;user-select:none;z-index:10;
+            transition:transform .3s;position:relative;
+        }
+        /* 彩虹装饰线 */
+        #sidebar::after{
+            content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+            background:linear-gradient(90deg,var(--rainbow-1),var(--rainbow-2),var(--rainbow-3),var(--rainbow-4),var(--rainbow-5),var(--rainbow-6),var(--rainbow-7));
+        }
+        .sb-logo{
+            font-size:1.15rem;font-weight:800;color:#fff;padding:8px 6px 20px 6px;
+            letter-spacing:.03em;white-space:nowrap;
+            display:flex;align-items:center;gap:10px;
+        }
+        .sb-logo .ico{
+            font-size:1.6rem;width:40px;height:40px;border-radius:50%;
+            background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;
+            box-shadow:0 0 20px rgba(147,197,253,.3);
+        }
+        .sb-logo .sub{display:block;font-size:.6rem;font-weight:400;opacity:.6;margin-top:2px;}
+        .nav-item{
+            display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+            cursor:pointer;font-size:.82rem;font-weight:600;color:rgba(255,255,255,.6);
+            transition:all .2s;white-space:nowrap;border:none;background:none;width:100%;text-align:left;
+        }
+        .nav-item:hover{background:rgba(255,255,255,.12);color:#fff;}
+        .nav-item.active{
+            background:rgba(255,255,255,.2);color:#fff;
+            box-shadow:0 4px 20px rgba(255,255,255,.15);
+            backdrop-filter:blur(10px);
+            border:1px solid rgba(255,255,255,.25);
+        }
+        .sb-footer{margin-top:auto;padding:12px 6px 0 6px;font-size:.62rem;color:rgba(255,255,255,.35);}
+        /* Sidebar toggle (mobile) */
+        .sb-toggle{
+            display:none;position:fixed;top:12px;left:12px;z-index:999;
+            width:38px;height:38px;border-radius:10px;border:none;
+            background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;
+            font-size:1.2rem;cursor:pointer;
+            box-shadow:0 4px 16px rgba(59,130,246,.35);
+        }
+        /* ===== Main ===== */
+        #main{flex:1;overflow-y:auto;padding:24px;position:relative;}
+        #main::-webkit-scrollbar{width:6px;}
+        #main::-webkit-scrollbar-track{background:transparent;}
+        #main::-webkit-scrollbar-thumb{
+            background:linear-gradient(180deg,var(--rainbow-5),var(--rainbow-6),var(--rainbow-7));
+            border-radius:3px;
+        }
+        .panel{display:none;animation:fadeIn .35s ease;}
+        .panel.active{display:block;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        /* 顶部彩虹装饰条 */
+        #main::before{
+            content:'';position:sticky;top:0;left:0;right:0;height:3px;z-index:5;
+            background:linear-gradient(90deg,var(--rainbow-1),var(--rainbow-2),var(--rainbow-3),var(--rainbow-4),var(--rainbow-5),var(--rainbow-6),var(--rainbow-7));
+            display:block;
+        }
+        /* ===== Common ===== */
+        .card{
+            background:var(--card-bg);border-radius:var(--radius);padding:20px;
+            box-shadow:0 2px 12px rgba(59,130,246,.06),0 1px 3px rgba(0,0,0,.03);
+            margin-bottom:16px;border:1px solid var(--border);
+            transition:box-shadow .25s;
+        }
+        .card:hover{box-shadow:0 4px 20px rgba(59,130,246,.1),0 1px 4px rgba(0,0,0,.04);}
+        .card h3{font-size:.95rem;margin-bottom:14px;color:var(--text);display:flex;align-items:center;gap:8px;font-weight:700;}
+        .card h4{font-size:.82rem;color:#2C3E5C;margin-bottom:10px;font-weight:700;}
+        .pg-title{
+            font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:18px;
+            display:flex;align-items:center;gap:10px;
+            padding:10px 16px;border-radius:14px;
+            background:linear-gradient(135deg,rgba(59,130,246,.06) 0%,rgba(147,197,253,.1) 100%);
+            border:1px solid rgba(59,130,246,.1);
+        }
+        .pg-title .emoji{font-size:1.4rem;}
+        /* ===== Buttons ===== */
+        .btn{
+            display:inline-flex;align-items:center;gap:6px;border:none;padding:9px 18px;
+            border-radius:22px;font-size:.78rem;font-weight:600;cursor:pointer;
+            transition:all .2s;font-family:inherit;white-space:nowrap;
+        }
+        .btn:active{transform:scale(.97);}
+        .btn-primary{
+            background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;
+            box-shadow:0 4px 14px rgba(59,130,246,.25);
+        }
+        .btn-primary:hover{box-shadow:0 6px 22px rgba(59,130,246,.4);transform:translateY(-1px);}
+        .btn-outline{background:#fff;color:var(--accent);border:1.5px solid var(--accent);}
+        .btn-outline:hover{background:var(--accent-light);box-shadow:0 4px 14px rgba(59,130,246,.15);}
+        .btn-sm{padding:5px 12px;font-size:.7rem;border-radius:14px;}
+        .btn-success{
+            background:linear-gradient(135deg,#10B981,#059669);color:#fff;
+            font-size:.82rem;padding:10px 22px;
+            box-shadow:0 4px 14px rgba(16,185,129,.25);
+        }
+        .btn-success:hover{box-shadow:0 6px 20px rgba(16,185,129,.4);transform:translateY(-1px);}
+        .btn-danger{
+            background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;
+            font-size:.82rem;padding:10px 22px;
+            box-shadow:0 4px 14px rgba(239,68,68,.25);
+        }
+        .btn-danger:hover{box-shadow:0 6px 20px rgba(239,68,68,.4);transform:translateY(-1px);}
+        .btn-del{background:#FEE2E2;color:#B91C1C;font-size:.68rem;padding:3px 8px;border-radius:8px;}
+        /* ===== Tags ===== */
+        .tag{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.66rem;font-weight:700;}
+        .tag-green{background:#D1FAE5;color:#065F46;}
+        .tag-blue{background:#DBEAFE;color:#1E40AF;}
+        .tag-orange{background:#FEF3C7;color:#92400E;}
+        .tag-red{background:#FEE2E2;color:#991B1B;}
+        .tag-rainbow{background:linear-gradient(90deg,var(--rainbow-1),var(--rainbow-2),var(--rainbow-3),var(--rainbow-4),var(--rainbow-5),var(--rainbow-6),var(--rainbow-7));color:#fff;padding:3px 10px;}
+        /* ===== Inputs ===== */
+        input,textarea,select{
+            border:1.5px solid #CBD5E1;border-radius:var(--radius-sm);padding:10px 14px;
+            font-size:.8rem;font-family:inherit;outline:none;transition:.2s;width:100%;
+            background:#F8FAFC;color:#1A2D4A;
+        }
+        input:focus,textarea:focus,select:focus{
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px rgba(59,130,246,.1);
+            background:#fff;
+        }
+        textarea{resize:vertical;min-height:80px;}
+        ::placeholder{color:#94A3B8;}
+        /* ===== Stats ===== */
+        .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px;}
+        .stat-box{
+            background:var(--card-bg);border-radius:12px;padding:16px 12px;text-align:center;
+            box-shadow:0 2px 10px rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.08);
+            transition:transform .2s,box-shadow .2s;
+        }
+        .stat-box:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(59,130,246,.12);}
+        .stat-box .num{font-size:1.6rem;font-weight:800;color:var(--accent);}
+        .stat-box .lbl{font-size:.68rem;color:var(--text2);margin-top:3px;font-weight:500;}
+        /* ===== Heatmap ===== */
+        .heatmap{display:flex;flex-wrap:wrap;gap:3px;justify-content:flex-start;}
+        .heatmap .day{width:12px;height:12px;border-radius:3px;background:#E8ECF2;}
+        .heatmap .day.lv1{background:#10B981;}
+        .heatmap .day.lv2{background:#F59E0B;}
+        .heatmap .day.lv3{background:#EF4444;}
+        .heatmap .day.today{border:2px solid #1E293B;}
+        /* ===== Mood ===== */
+        .mood-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+        .mood-btn{
+            width:48px;height:48px;border-radius:50%;border:2px solid transparent;cursor:pointer;
+            font-size:1.5rem;display:flex;align-items:center;justify-content:center;
+            transition:all .2s;background:#F8FAFC;
+        }
+        .mood-btn:hover{transform:scale(1.12);}
+        .mood-btn.sel{
+            border-color:var(--accent);
+            box-shadow:0 0 0 5px rgba(59,130,246,.12);
+            background:#EFF6FF;
+        }
+        /* ===== Diet ===== */
+        .day-card{
+            margin-bottom:14px;border:1.5px solid rgba(59,130,246,.1);border-radius:var(--radius);
+            overflow:hidden;background:#fff;
+            box-shadow:0 2px 10px rgba(59,130,246,.04);
+        }
+        .day-card h4{
+            background:linear-gradient(135deg,#EFF6FF,#F0F9FF);
+            padding:10px 16px;border-bottom:1px solid rgba(59,130,246,.1);font-size:.8rem;
+        }
+        .meal-row{padding:12px 16px;border-bottom:1px solid #F3F4F6;display:flex;gap:10px;align-items:flex-start;}
+        .meal-row:last-child{border-bottom:none;}
+        .meal-tag{font-size:.66rem;font-weight:700;padding:3px 9px;border-radius:8px;white-space:nowrap;min-width:46px;text-align:center;}
+        .meal-tag.bf{background:#FEF3C7;color:#92400E;}
+        .meal-tag.lu{background:#D1FAE5;color:#065F46;}
+        .meal-tag.di{background:#EDE9FE;color:#5B21B6;}
+        .meal-info{flex:1;min-width:0;}
+        .meal-info .name{font-weight:700;font-size:.82rem;}
+        .meal-info .detail{font-size:.7rem;color:var(--text2);margin-top:3px;word-break:break-all;}
+        .meal-info .steps{font-size:.68rem;color:#8899B4;margin-top:2px;}
+        .airfry{display:inline-block;font-size:.64rem;font-weight:700;background:#FFF7ED;color:#C2410C;padding:2px 8px;border-radius:6px;margin-top:4px;}
+        .diet-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px;}
+        .diet-tab{
+            border:none;padding:8px 13px;border-radius:20px;font-size:.75rem;font-weight:600;
+            cursor:pointer;background:#E2E8F0;color:#64748B;transition:all .2s;
+        }
+        .diet-tab.on{
+            background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;
+            box-shadow:0 4px 12px rgba(59,130,246,.25);
+        }
+        /* ===== Ledger ===== */
+        .ledger-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+        .ledger-form input,.ledger-form select{width:auto;flex:1;min-width:80px;}
+        .ledger-item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #F3F4F6;font-size:.78rem;}
+        .ledger-item .amt-exp{color:#EF4444;font-weight:700;margin-left:auto;white-space:nowrap;}
+        .ledger-item .amt-inc{color:#10B981;font-weight:700;margin-left:auto;white-space:nowrap;}
+        .cat-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:8px 0;}
+        .cat-bar div{transition:width .5s;}
+        .cat-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:.66rem;margin-top:6px;}
+        /* ===== Trending V2 · 爆款二创 ===== */
+        .trend-cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px;}
+        /* ===== 品类热点卡片 ===== */
+        .trend-card{
+            border-radius:var(--radius);padding:16px;border:1.5px solid rgba(59,130,246,.1);
+            background:#fff;transition:all .25s;cursor:default;position:relative;
+            box-shadow:0 2px 10px rgba(59,130,246,.04);
+        }
+        .trend-card:hover{
+            border-color:var(--accent);
+            box-shadow:0 8px 24px rgba(59,130,246,.12);
+            transform:translateY(-3px);
+        }
+        .trend-card .t-cat{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+        .trend-card .t-title{font-weight:700;font-size:.82rem;margin-bottom:4px;line-height:1.3;}
+        .trend-card .t-detail{font-size:.68rem;color:var(--text2);line-height:1.5;}
+        .trend-card .t-val{font-size:1.2rem;font-weight:800;margin-top:6px;}
+        .trend-card .t-note{font-size:.6rem;color:var(--text2);margin-top:2px;}
+        /* ===== 热度标签 ===== */
+        .tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.62rem;font-weight:700
